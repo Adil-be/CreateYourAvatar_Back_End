@@ -154,18 +154,16 @@ permettant l’authentification avec les informations de connexion suivantes :
 erDiagram
 
  Nft }o--|| User : own
- Nft }o--|| Model : base
+ Nft }o--|| NftModel : base
  Nft ||--o{ EthValue : worth
 
 
  Nft {
     int id
-    string name
     float buyingPrice
     string token
     bool inSale
     date datePurchase
-    string description
  }
 
 NftImg{
@@ -180,15 +178,17 @@ EthValue {
     float value
 }
 
-Model }o--|| Collection : belong
-Model }o--o{ Category : belong
-Model ||--|| NftImg : link
+NftModel }o--|| Collection : belong
+NftModel }o--o{ Category : belong
+NftModel ||--|| NftImg : link
 
-Model {
+NftModel {
     int id
+    string name
     float initPrice
     int quantity
     int availableQuantity
+    string description
 }
 
 Collection{
@@ -230,14 +230,10 @@ City{
     string name
 }
 
-Conty }o--|| Contry :belong
+
 Conty{
     string zipcode
     string name
 }
 
-Contry{
-    string name
-    string IsoCode
-}
 ```
