@@ -18,7 +18,7 @@ class NftImage
 
 
     // NOTE: This is not a mapped field of entity metadata, just a simple property.
-    #[Vich\UploadableField(mapping: 'nftImage', fileNameProperty: 'imageName', size: 'imageSize')]
+    #[Vich\UploadableField(mapping: 'nftImages', fileNameProperty: 'name', size: 'size')]
     private ?File $file = null;
 
     #[ORM\Column(length: 255)]
