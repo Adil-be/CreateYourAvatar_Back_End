@@ -27,7 +27,6 @@ class NftModel
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
 
-
     #[ORM\OneToMany(mappedBy: 'nftModel', targetEntity: Nft::class)]
     private Collection $nft;
 
@@ -42,15 +41,12 @@ class NftModel
 
     #[ORM\ManyToOne(inversedBy: 'nftModels')]
 
-
     public function __construct()
     {
         $this->nft = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->nftImages = new ArrayCollection();
     }
-
-
 
     public function getInitialPrice(): ?float
     {
