@@ -2,27 +2,53 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\HasIdTraits;
 use App\Repository\NftRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+
 
 #[ORM\Entity(repositoryClass: NftRepository::class)]
+#[ApiResource(
+    normalizationContext: ['groups' => ['read']],
+    denormalizationContext: ['groups' => ['write']],
+    operations: [
+        new Get(),
+        new Patch(),
+        new Delete(),
+        new GetCollection(),
+        new Post(),
+    ], )]
 class Nft
 {
     use HasIdTraits;
 
     #[ORM\Column]
+    #[Groups(['write', 'read'])]
     private ?float $buyingPrice = null;
+    
+    #[Groups(['write', 'read'])]
+    #[ORM\Column(nullable: true)]
+    private ?float $sellingPrice = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['read'])]
     private ?string $token = null;
 
     #[ORM\Column]
+    #[Groups(['write', 'read'])]
     private ?bool $inSale = null;
 
     #[ORM\Column]
+    #[Groups(['read'])]
     private ?\DateTimeImmutable $purchaseDate = null;
 
     #[ORM\OneToMany(mappedBy: 'nft', targetEntity: NftValue::class)]
@@ -31,13 +57,10 @@ class Nft
     #[ORM\ManyToOne(inversedBy: 'nft')]
     private ?NftModel $nftModel = null;
 
-  
-
     #[ORM\ManyToOne(inversedBy: 'Nfts')]
     private ?User $user = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?float $sellingPrice = null;
+    
 
     public function __construct()
     {

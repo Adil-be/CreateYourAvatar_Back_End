@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\HasIdTraits;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -9,13 +10,30 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ApiResource(
+    normalizationContext: ['groups' => ['read']],
+    denormalizationContext: ['groups' => ['write']],
+    operations: [
+        new Get(),
+        new Patch(),
+        new Delete(),
+        new GetCollection(),
+        new Post(),
+    ], )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use HasIdTraits;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Groups(['write', 'read'])]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -25,21 +43,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Groups(['write', 'read'])]
     private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['write', 'read'])]
     private ?string $username = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['write', 'read'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['write', 'read'])]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['write', 'read'])]
     private ?string $gender = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['write', 'read'])]
     private ?\DateTimeImmutable $birthday = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Nft::class)]
@@ -49,7 +73,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?UserImage $userImage = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $Address = null;
+    #[Groups(['write', 'read'])]
+    private ?string $address = null;
 
     public function __construct()
     {
@@ -230,12 +255,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getAddress(): ?string
     {
-        return $this->Address;
+        return $this->address;
     }
 
-    public function setAddress(?string $Address): static
+    public function setAddress(?string $address): static
     {
-        $this->Address = $Address;
+        $this->address = $address;
 
         return $this;
     }

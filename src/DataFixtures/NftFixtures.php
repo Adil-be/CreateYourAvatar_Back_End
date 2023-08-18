@@ -56,6 +56,7 @@ class NftFixtures extends Fixture implements DependentFixtureInterface
                 $manager->persist($nft);
             }
         }
+        $manager->flush();
     }
 
     public function createNft(NftModel $nftModel, User $user): Nft

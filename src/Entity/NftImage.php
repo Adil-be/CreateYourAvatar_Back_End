@@ -2,26 +2,43 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\HasIdTraits;
 use App\Entity\Traits\HasNameTrait;
 use App\Repository\NftImageRepository;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 
+use Symfony\Component\Serializer\Annotation\Groups;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\HttpFoundation\File\File;
 
 #[ORM\Entity(repositoryClass: NftImageRepository::class)]
+#[ApiResource(
+    normalizationContext: ['groups' => ['read']],
+    denormalizationContext: ['groups' => ['write']],
+    operations: [
+        new Get(),
+        new Patch(),
+        new Delete(),
+        new GetCollection(),
+        new Post(),
+    ], )]
 class NftImage
 {
     use HasIdTraits;
     use HasNameTrait;
-
 
     // NOTE: This is not a mapped field of entity metadata, just a simple property.
     #[Vich\UploadableField(mapping: 'nftImages', fileNameProperty: 'name', size: 'size')]
     private ?File $file = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['write', 'read'])]
     private ?string $path = null;
 
     #[ORM\Column(nullable: true)]
@@ -30,6 +47,7 @@ class NftImage
 
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'nftImages')]
