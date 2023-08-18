@@ -34,7 +34,11 @@ class NftImage
 
     #[ORM\ManyToOne(inversedBy: 'nftImages')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Nft $Nft = null;
+    private ?NftModel $nftModel = null;
+
+    #[ORM\ManyToOne(inversedBy: 'nftImages')]
+    #[ORM\JoinColumn(nullable: false)]
+
 
 
     public function getPath(): ?string
@@ -73,17 +77,9 @@ class NftImage
         return $this;
     }
 
-    public function getNft(): ?Nft
-    {
-        return $this->Nft;
-    }
 
-    public function setNft(?Nft $Nft): static
-    {
-        $this->Nft = $Nft;
 
-        return $this;
-    }
+
 
     /**
      * If manually uploading a file (i.e. not using Symfony Form) ensure an instance
@@ -108,5 +104,17 @@ class NftImage
     public function getFile(): ?File
     {
         return $this->file;
+    }
+
+    public function getNftModel(): ?NftModel
+    {
+        return $this->nftModel;
+    }
+
+    public function setNftModel(?NftModel $nftModel): static
+    {
+        $this->nftModel = $nftModel;
+
+        return $this;
     }
 }
