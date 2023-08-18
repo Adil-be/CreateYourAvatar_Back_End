@@ -18,13 +18,13 @@ class NftCollection
     #[ORM\OneToMany(mappedBy: 'nftCollection', targetEntity: NftModel::class)]
     private Collection $NftModels;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $path = null;
+
     public function __construct()
     {
         $this->NftModels = new ArrayCollection();
     }
-
-
-
 
 
     /**
@@ -53,6 +53,18 @@ class NftCollection
                 $nftModel->setNftCollection(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPath(): ?string
+    {
+        return $this->path;
+    }
+
+    public function setPath(?string $path): static
+    {
+        $this->path = $path;
 
         return $this;
     }

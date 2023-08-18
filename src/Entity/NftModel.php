@@ -12,18 +12,16 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: NftModelRepository::class)]
 class NftModel
 {
-
-    
     use HasIdTraits;
     use HasNameTrait;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?float $initialPrice = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?int $quantity = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -36,12 +34,20 @@ class NftModel
     #[ORM\ManyToOne(inversedBy: 'NftModels')]
     private ?NftCollection $nftCollection = null;
 
+    #[ORM\ManyToMany(targetEntity: Category::class, mappedBy: 'nftModels')]
+    private Collection $categories;
+
+    #[ORM\OneToMany(mappedBy: 'nftModel', targetEntity: NftImage::class)]
+    private Collection $nftImages;
+
     #[ORM\ManyToOne(inversedBy: 'nftModels')]
-    private ?NftCategory $nftCategory = null;
+
 
     public function __construct()
     {
         $this->nft = new ArrayCollection();
+        $this->categories = new ArrayCollection();
+        $this->nftImages = new ArrayCollection();
     }
 
 
@@ -136,15 +142,61 @@ class NftModel
         return $this;
     }
 
-    public function getNftCategory(): ?NftCategory
+    /**
+     * @return Collection<int, Category>
+     */
+    public function getCategories(): Collection
     {
-        return $this->nftCategory;
+        return $this->categories;
     }
 
-    public function setNftCategory(?NftCategory $nftCategory): static
+    public function addCategory(Category $category): static
     {
-        $this->nftCategory = $nftCategory;
+        if (!$this->categories->contains($category)) {
+            $this->categories->add($category);
+            $category->addNftModel($this);
+        }
 
         return $this;
     }
+
+    public function removeCategory(Category $category): static
+    {
+        if ($this->categories->removeElement($category)) {
+            $category->removeNftModel($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, NftImage>
+     */
+    public function getNftImages(): Collection
+    {
+        return $this->nftImages;
+    }
+
+    public function addNftImage(NftImage $nftImage): static
+    {
+        if (!$this->nftImages->contains($nftImage)) {
+            $this->nftImages->add($nftImage);
+            $nftImage->setNftModel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNftImage(NftImage $nftImage): static
+    {
+        if ($this->nftImages->removeElement($nftImage)) {
+            // set the owning side to null (unless already changed)
+            if ($nftImage->getNftModel() === $this) {
+                $nftImage->setNftModel(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

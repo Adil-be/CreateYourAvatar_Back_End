@@ -2,63 +2,74 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\NftCollection;
+use App\Entity\NftImage;
 use App\Repository\NftModelRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class NftCollectionFixtures extends Fixture
+
+class NftImageFixtures extends Fixture implements DependentFixtureInterface
 {
     private NftModelRepository $nftModelRepository;
 
     public function __construct(NftModelRepository $nftModelRepository)
     {
+
         $this->nftModelRepository = $nftModelRepository;
     }
+
+
     public function load(ObjectManager $manager): void
     {
 
+        $nftModels = $this->nftModelRepository->findAll();
         $fileSystem = new Filesystem();
-        $destination = __DIR__ . '/../../public/images/collectionImages/';
-        $collections = ['SteamPunk', 'HeroicFantasy', 'CyberTech'];
+        $destination = __DIR__ . '/../../public/images/nftImages/';
 
         $init = $this->deleteDir($destination);
 
-
-        foreach ($collections as $collectionName) {
-            $nftCollection = new NftCollection();
-            $nftCollection->setName($collectionName);
-            $nftCollection->setPath($destination . $nftCollection->getName() . '.jpg');
-
-            $imageFile = $this->createImage($nftCollection->getName());
+        foreach ($nftModels as $nftModel) {
+            $imageFile = $this->createImage($nftModel->getName());
             $fileSystem->copy(
                 $imageFile->getRealPath(),
                 $destination . $imageFile->getFilename()
             );
-            $manager->persist($nftCollection);
-        }
 
+            $nftImage = new NftImage();
+            $nftImage
+                ->setSize($imageFile->getSize())
+                ->setPath($destination . $imageFile->getFilename().'.png')
+                ->setName($imageFile->getFilename())
+                ->setNftModel($nftModel);
+
+            $manager->persist($nftImage);
+
+        }
         $manager->flush();
     }
-
+    public function getDependencies()
+    {
+        return [
+            NftModelFixtures::class,
+        ];
+    }
     public function createImage(string $name): UploadedFile
     {
-
-        $folder = __DIR__ . '/../../var/images/collectionImages/';
+        $folder = __DIR__ . '/../../var/images/nftImages/';
         $imageName = str_replace(' ', '_', $name);
-        $imageName = $imageName . '.jpg';
+        $imageName = $imageName . '.png';
         $src = $folder . $imageName;
 
         return new UploadedFile(
             path: $src,
             originalName: $imageName,
-            mimeType: 'image/jpeg',
+            mimeType: 'image/png',
             test: true
         );
     }
-
     public function deleteDir(string $dir): bool
     {
         $files = [];

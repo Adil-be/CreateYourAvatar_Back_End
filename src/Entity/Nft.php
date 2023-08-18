@@ -31,16 +31,17 @@ class Nft
     #[ORM\ManyToOne(inversedBy: 'nft')]
     private ?NftModel $nftModel = null;
 
-    #[ORM\OneToMany(mappedBy: 'Nft', targetEntity: NftImage::class)]
-    private Collection $nftImages;
+  
 
     #[ORM\ManyToOne(inversedBy: 'Nfts')]
     private ?User $user = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?float $sellingPrice = null;
+
     public function __construct()
     {
         $this->NftValues = new ArrayCollection();
-        $this->nftImages = new ArrayCollection();
     }
 
 
@@ -134,35 +135,6 @@ class Nft
         return $this;
     }
 
-    /**
-     * @return Collection<int, NftImage>
-     */
-    public function getNftImages(): Collection
-    {
-        return $this->nftImages;
-    }
-
-    public function addNftImage(NftImage $nftImage): static
-    {
-        if (!$this->nftImages->contains($nftImage)) {
-            $this->nftImages->add($nftImage);
-            $nftImage->setNft($this);
-        }
-
-        return $this;
-    }
-
-    public function removeNftImage(NftImage $nftImage): static
-    {
-        if ($this->nftImages->removeElement($nftImage)) {
-            // set the owning side to null (unless already changed)
-            if ($nftImage->getNft() === $this) {
-                $nftImage->setNft(null);
-            }
-        }
-
-        return $this;
-    }
 
     public function getUser(): ?User
     {
@@ -172,6 +144,18 @@ class Nft
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getSellingPrice(): ?float
+    {
+        return $this->sellingPrice;
+    }
+
+    public function setSellingPrice(?float $sellingPrice): static
+    {
+        $this->sellingPrice = $sellingPrice;
 
         return $this;
     }
