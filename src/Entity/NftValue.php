@@ -20,10 +20,10 @@ use ApiPlatform\Metadata\GetCollection;
     denormalizationContext: ['groups' => ['write']],
     operations: [
         new Get(),
-        new Put(),
-        new Delete(),
+        // new Put(),
+        // new Delete(),
         new GetCollection(),
-        new Post(),
+        // new Post(),
     ], )]
 class NftValue
 {

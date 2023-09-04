@@ -19,15 +19,15 @@ use ApiPlatform\Metadata\Put;
 
 #[ORM\Entity(repositoryClass: NftModelRepository::class)]
 #[ApiResource(
-    // normalizationContext: ['groups' => ['read']],
-    // denormalizationContext: ['groups' => ['write']],
+    normalizationContext: ['groups' => ['read']],
+    denormalizationContext: ['groups' => ['write']],
     operations: [
         new Get(),
-        new Patch(),
-        new Put(),
-        new Delete(),
+        new Patch("is_granted('ROLE_ADMIN')"),
+        new Put("is_granted('ROLE_ADMIN')"),
+        new Delete("is_granted('ROLE_ADMIN')"),
         new GetCollection(),
-        new Post(),
+        new Post("is_granted('ROLE_ADMIN')"),
     ], )]
 class NftModel
 {

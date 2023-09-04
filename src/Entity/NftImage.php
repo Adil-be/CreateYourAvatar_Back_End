@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\File\File;
         new Put(),
         new Delete(),
         new GetCollection(),
-        new Post(),
+        new Post(security: "is_granted('ROLE_ADMIN')"),
     ], )]
 class NftImage
 {

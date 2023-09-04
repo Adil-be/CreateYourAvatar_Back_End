@@ -23,11 +23,11 @@ use ApiPlatform\Metadata\Put;
     denormalizationContext: ['groups' => ['write']],
     operations: [
         new Get(),
-        new Patch(),
-        new Put(),
-        new Delete(),
+        new Patch(security: "is_granted('ROLE_ADMIN') or object.owner == user"),
+        new Put(security: "is_granted('ROLE_ADMIN') or object.owner == user"),
+        new Delete(security: "is_granted('ROLE_ADMIN') or object.owner == user"),
         new GetCollection(),
-        new Post(),
+        new Post(security: "is_granted('ROLE_ADMIN')"),
     ], )]
 class Nft
 {
