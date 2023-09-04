@@ -25,7 +25,7 @@ use ApiPlatform\Metadata\Patch;
     operations: [
         new Get(),
         new Patch(security: "is_granted('ROLE_ADMIN') or object.owner == user"),
-        new GetCollection("is_granted('ROLE_ADMIN')"),
+        new GetCollection(security:"is_granted('ROLE_ADMIN')"),
         new Post(),
     ], )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUserInterface
