@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Put;
 use App\Entity\Traits\HasIdTraits;
 use App\Repository\NftValueRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -11,7 +12,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
+
 
 #[ORM\Entity(repositoryClass: NftValueRepository::class)]
 #[ApiResource(
@@ -19,7 +20,7 @@ use ApiPlatform\Metadata\Patch;
     denormalizationContext: ['groups' => ['write']],
     operations: [
         new Get(),
-        new Patch(),
+        new Put(),
         new Delete(),
         new GetCollection(),
         new Post(),

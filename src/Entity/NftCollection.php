@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Put;
 
 #[ORM\Entity(repositoryClass: NftCollectionRepository::class)]
 #[ApiResource(
@@ -23,6 +24,7 @@ use ApiPlatform\Metadata\Patch;
     operations: [
         new Get(),
         new Patch(),
+        new Put(),
         new Delete(),
         new GetCollection(),
         new Post(),

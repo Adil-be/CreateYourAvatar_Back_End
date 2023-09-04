@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Put;
 
 #[ORM\Entity(repositoryClass: NftModelRepository::class)]
 #[ApiResource(
@@ -23,6 +24,7 @@ use ApiPlatform\Metadata\Patch;
     operations: [
         new Get(),
         new Patch(),
+        new Put(),
         new Delete(),
         new GetCollection(),
         new Post(),
@@ -32,12 +34,21 @@ class NftModel
     use HasIdTraits;
     use HasNameTrait;
 
+    public function __construct()
+    {
+        $this->nft = new ArrayCollection();
+        $this->categories = new ArrayCollection();
+        $this->nftImages = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable;
+    }
+
+
     #[ORM\Column(nullable: true)]
-    // #[Groups(['read'])]
+    #[Groups(['read'])]
     private ?float $initialPrice = null;
 
     #[ORM\Column]
-    // #[Groups(['read'])]
+    #[Groups(['read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
@@ -61,12 +72,6 @@ class NftModel
 
     #[ORM\ManyToOne(inversedBy: 'nftModels')]
 
-    public function __construct()
-    {
-        $this->nft = new ArrayCollection();
-        $this->categories = new ArrayCollection();
-        $this->nftImages = new ArrayCollection();
-    }
 
     public function getInitialPrice(): ?float
     {
@@ -83,13 +88,6 @@ class NftModel
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
     }
 
     public function getQuantity(): ?int

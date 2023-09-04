@@ -66,6 +66,7 @@ class NftFixtures extends Fixture implements DependentFixtureInterface
         $nft->setPurchaseDate(new \DateTimeImmutable);
         $nft->setSellingPrice($nftModel->getInitialPrice());
         $nft->setToken($this->faker->md5());
+        $nft->setNftModel($nftModel);
         $nft->setUser($user);
         return $nft;
     }

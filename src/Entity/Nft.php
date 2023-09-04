@@ -14,15 +14,17 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Put;
 
 
 #[ORM\Entity(repositoryClass: NftRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['read']],
+    normalizationContext: ['groups' => ['read','nft:read']],
     denormalizationContext: ['groups' => ['write']],
     operations: [
         new Get(),
         new Patch(),
+        new Put(),
         new Delete(),
         new GetCollection(),
         new Post(),
@@ -34,7 +36,7 @@ class Nft
     #[ORM\Column]
     #[Groups(['write', 'read'])]
     private ?float $buyingPrice = null;
-    
+
     #[Groups(['write', 'read'])]
     #[ORM\Column(nullable: true)]
     private ?float $sellingPrice = null;
@@ -55,12 +57,14 @@ class Nft
     private Collection $NftValues;
 
     #[ORM\ManyToOne(inversedBy: 'nft')]
+    #[Groups(['read','nft:read'])]
     private ?NftModel $nftModel = null;
 
     #[ORM\ManyToOne(inversedBy: 'Nfts')]
+    #[Groups(['read'])]
     private ?User $user = null;
 
-    
+
 
     public function __construct()
     {

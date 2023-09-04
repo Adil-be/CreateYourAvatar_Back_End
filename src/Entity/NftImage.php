@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Put;
 
 use Symfony\Component\Serializer\Annotation\Groups;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
@@ -24,6 +25,7 @@ use Symfony\Component\HttpFoundation\File\File;
     operations: [
         new Get(),
         new Patch(),
+        new Put(),
         new Delete(),
         new GetCollection(),
         new Post(),
