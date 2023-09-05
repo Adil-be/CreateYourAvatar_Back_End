@@ -2,42 +2,70 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\HasIdTraits;
 use App\Repository\NftRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Put;
+
 
 #[ORM\Entity(repositoryClass: NftRepository::class)]
+#[ApiResource(
+    normalizationContext: ['groups' => ['nft:read','read']],
+    denormalizationContext: ['groups' => ['nft:write','write']],
+    operations: [
+        new Get(),
+        new Patch(security: "is_granted('ROLE_ADMIN') or object.owner == user"),
+        new Put(security: "is_granted('ROLE_ADMIN') or object.owner == user"),
+        new Delete(security: "is_granted('ROLE_ADMIN') or object.owner == user"),
+        new GetCollection(),
+        new Post(security: "is_granted('ROLE_ADMIN')"),
+    ], )]
 class Nft
 {
     use HasIdTraits;
 
     #[ORM\Column]
+    #[Groups(['nft:write', 'nft:read'])]
     private ?float $buyingPrice = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['nft:write', 'nft:read'])]
+    private ?float $sellingPrice = null;
+
     #[ORM\Column(length: 255)]
+    #[Groups(['nft:read'])]
     private ?string $token = null;
 
     #[ORM\Column]
+    #[Groups(['nft:write', 'nft:read'])]
     private ?bool $inSale = null;
 
     #[ORM\Column]
+    #[Groups(['nft:read'])]
     private ?\DateTimeImmutable $purchaseDate = null;
 
     #[ORM\OneToMany(mappedBy: 'nft', targetEntity: NftValue::class)]
+    #[Groups(['nft:read'])]
     private Collection $NftValues;
 
     #[ORM\ManyToOne(inversedBy: 'nft')]
+    #[Groups(['nft:read'])]
     private ?NftModel $nftModel = null;
 
-  
-
     #[ORM\ManyToOne(inversedBy: 'Nfts')]
+    #[Groups(['nft:read'])]
     private ?User $user = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?float $sellingPrice = null;
+
 
     public function __construct()
     {

@@ -2,20 +2,25 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\HasIdTraits;
 use App\Entity\Traits\HasNameTrait;
 use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
+#[ApiResource()]
+
 class Category
 {
     use HasIdTraits;
     use HasNameTrait;
 
     #[ORM\ManyToOne(targetEntity: self::class)]
+    #[MaxDepth(2)]
     private ?self $parent = null;
 
     #[ORM\ManyToMany(targetEntity: NftModel::class, inversedBy: 'categories')]

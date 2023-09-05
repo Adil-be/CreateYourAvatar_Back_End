@@ -20,7 +20,7 @@ db-create: ## Create the database
 
 
 db-drop: ## Drop the database
-	$(SYMFONY_CONSOLE) doctrine:database:drop --force 
+	$(SYMFONY_CONSOLE) doctrine:database:drop --if-exists --force 
 
 migrate: ## Migrate the database
 	$(SYMFONY_CONSOLE) doctrine:migrations:migrate -n
@@ -29,7 +29,7 @@ fixtures: ## Load the fixtures
 	$(SYMFONY_CONSOLE) doctrine:fixtures:load -n
 
 regenerate:
-	$(SYMFONY_CONSOLE) doctrine:database:drop --force 
-	$(SYMFONY_CONSOLE) doctrine:database:create
-	$(SYMFONY_CONSOLE) doctrine:migrations:migrate -n
-	$(SYMFONY_CONSOLE) doctrine:fixtures:load -n
+	$(MAKE) db-drop
+	$(MAKE) db-create
+	$(MAKE) migrate
+	$(MAKE) fixtures

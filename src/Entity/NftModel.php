@@ -2,51 +2,80 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\HasIdTraits;
 use App\Entity\Traits\HasNameTrait;
 use App\Repository\NftModelRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Put;
 
 #[ORM\Entity(repositoryClass: NftModelRepository::class)]
+#[ApiResource(
+    normalizationContext: ['groups' => ['read','NftModel:read']],
+    denormalizationContext: ['groups' => ['NftModel:write']],
+    operations: [
+        new Get(),
+        new Patch(security: "is_granted('ROLE_ADMIN')"),
+        new Put(security:"is_granted('ROLE_ADMIN')"),
+        new Delete(security:"is_granted('ROLE_ADMIN')"),
+        new GetCollection(),
+        new Post(security:"is_granted('ROLE_ADMIN')"),
+    ], )]
 class NftModel
 {
     use HasIdTraits;
     use HasNameTrait;
-
-    #[ORM\Column(nullable: true)]
-    private ?float $initialPrice = null;
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?int $quantity = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $description = null;
-
-    #[ORM\OneToMany(mappedBy: 'nftModel', targetEntity: Nft::class)]
-    private Collection $nft;
-
-    #[ORM\ManyToOne(inversedBy: 'NftModels')]
-    private ?NftCollection $nftCollection = null;
-
-    #[ORM\ManyToMany(targetEntity: Category::class, mappedBy: 'nftModels')]
-    private Collection $categories;
-
-    #[ORM\OneToMany(mappedBy: 'nftModel', targetEntity: NftImage::class)]
-    private Collection $nftImages;
-
-    #[ORM\ManyToOne(inversedBy: 'nftModels')]
 
     public function __construct()
     {
         $this->nft = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->nftImages = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable;
     }
+
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['NftModel:read'])]
+    private ?float $initialPrice = null;
+
+    #[ORM\Column]
+    #[Groups(['NftModel:read'])]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $quantity = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['NftModel:write','NftModel:read'])]
+    private ?string $description = null;
+
+    #[ORM\OneToMany(mappedBy: 'nftModel', targetEntity: Nft::class)]
+    #[Groups(['NftModel:read'])]
+    private Collection $nft;
+
+    #[ORM\ManyToOne(inversedBy: 'NftModels')]
+    #[Groups(['NftModel:read'])]
+    private ?NftCollection $nftCollection = null;
+
+    #[ORM\ManyToMany(targetEntity: Category::class, mappedBy: 'nftModels')]
+    #[Groups(['NftModel:read'])]
+    private Collection $categories;
+
+    #[ORM\OneToMany(mappedBy: 'nftModel', targetEntity: NftImage::class)]
+    #[Groups(['NftModel:read'])]
+    private Collection $nftImages;
+
+    #[ORM\ManyToOne(inversedBy: 'nftModels')]
+
 
     public function getInitialPrice(): ?float
     {
@@ -63,13 +92,6 @@ class NftModel
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
     }
 
     public function getQuantity(): ?int

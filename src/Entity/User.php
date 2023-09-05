@@ -2,23 +2,42 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\HasIdTraits;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Lexik\Bundle\JWTAuthenticationBundle\Security\User\JWTUserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+#[ApiResource(
+    normalizationContext: ['groups' => ['user:read']],
+    denormalizationContext: ['groups' => ['user:write']],
+    operations: [
+        new Get(),
+        new Patch(security: "is_granted('ROLE_ADMIN') or object.owner == user"),
+        new GetCollection(security:"is_granted('ROLE_ADMIN')"),
+        new Post(),
+    ], )]
+class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUserInterface
 {
     use HasIdTraits;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Groups(['user:write','user:read'])]
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Groups(['user:read'])]
     private array $roles = [];
 
     /**
@@ -28,32 +47,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['user:write', 'user:read'])]
     private ?string $username = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['user:write', 'user:read'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['user:write', 'user:read'])]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['user:write', 'user:read'])]
     private ?string $gender = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['user:write', 'user:read'])]
     private ?\DateTimeImmutable $birthday = null;
+    
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['user:write', 'user:read'])]
+    private ?string $address = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Nft::class)]
+    #[Groups(['user:write','user:read'])]
     private Collection $Nfts;
 
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
+    #[Groups(['user:write','user:read'])]
     private ?UserImage $userImage = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $Address = null;
-
+    
     public function __construct()
     {
         $this->Nfts = new ArrayCollection();
+    }
+
+    public function setId(?int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getEmail(): ?string
@@ -230,13 +265,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getAddress(): ?string
     {
-        return $this->Address;
+        return $this->address;
     }
 
-    public function setAddress(?string $Address): static
+    public function setAddress(?string $address): static
     {
-        $this->Address = $Address;
+        $this->address = $address;
 
         return $this;
+    }
+
+    public static function createFromPayload($username, array $payload): self
+    {
+        return (new self())
+            ->setId($username)
+            ->setRoles($payload['roles'])
+            ->setEmail($payload['email'])
+        ;
     }
 }

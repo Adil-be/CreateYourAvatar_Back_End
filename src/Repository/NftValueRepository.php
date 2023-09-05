@@ -18,7 +18,7 @@ class NftValueRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, ValueNft::class);
+        parent::__construct($registry, NftValue::class);
     }
 
     public function save(NftValue $entity, bool $flush = false): void
