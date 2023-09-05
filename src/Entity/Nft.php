@@ -19,8 +19,8 @@ use ApiPlatform\Metadata\Put;
 
 #[ORM\Entity(repositoryClass: NftRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['read','nft:read']],
-    denormalizationContext: ['groups' => ['write']],
+    normalizationContext: ['groups' => ['nft:read','read']],
+    denormalizationContext: ['groups' => ['nft:write','write']],
     operations: [
         new Get(),
         new Patch(security: "is_granted('ROLE_ADMIN') or object.owner == user"),
@@ -34,34 +34,35 @@ class Nft
     use HasIdTraits;
 
     #[ORM\Column]
-    #[Groups(['write', 'read'])]
+    #[Groups(['nft:write', 'nft:read'])]
     private ?float $buyingPrice = null;
 
-    #[Groups(['write', 'read'])]
     #[ORM\Column(nullable: true)]
+    #[Groups(['nft:write', 'nft:read'])]
     private ?float $sellingPrice = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['read'])]
+    #[Groups(['nft:read'])]
     private ?string $token = null;
 
     #[ORM\Column]
-    #[Groups(['write', 'read'])]
+    #[Groups(['nft:write', 'nft:read'])]
     private ?bool $inSale = null;
 
     #[ORM\Column]
-    #[Groups(['read'])]
+    #[Groups(['nft:read'])]
     private ?\DateTimeImmutable $purchaseDate = null;
 
     #[ORM\OneToMany(mappedBy: 'nft', targetEntity: NftValue::class)]
+    #[Groups(['nft:read'])]
     private Collection $NftValues;
 
     #[ORM\ManyToOne(inversedBy: 'nft')]
-    #[Groups(['read','nft:read'])]
+    #[Groups(['nft:read'])]
     private ?NftModel $nftModel = null;
 
     #[ORM\ManyToOne(inversedBy: 'Nfts')]
-    #[Groups(['read'])]
+    #[Groups(['nft:read'])]
     private ?User $user = null;
 
 

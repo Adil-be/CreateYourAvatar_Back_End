@@ -19,8 +19,8 @@ use ApiPlatform\Metadata\Put;
 
 #[ORM\Entity(repositoryClass: NftCollectionRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['read']],
-    denormalizationContext: ['groups' => ['write']],
+    normalizationContext: ['groups' => ['NftCollection:read', 'read']],
+    denormalizationContext: ['groups' => ['NftCollection:write', 'write']],
     operations: [
         new Get(),
         new Patch(security: "is_granted('ROLE_ADMIN')"),
@@ -35,10 +35,11 @@ class NftCollection
     use HasNameTrait;
 
     #[ORM\OneToMany(mappedBy: 'nftCollection', targetEntity: NftModel::class)]
+    #[Groups(['NftCollection:read'])]
     private Collection $NftModels;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['write', 'read'])]
+    #[Groups(['NftCollection:write', 'NftCollection:read'])]
     private ?string $path = null;
 
     public function __construct()

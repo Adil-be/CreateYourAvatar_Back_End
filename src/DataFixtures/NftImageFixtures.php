@@ -9,16 +9,19 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Routing\RouterInterface;
 
 
 class NftImageFixtures extends Fixture implements DependentFixtureInterface
 {
     private NftModelRepository $nftModelRepository;
+    private RouterInterface $router;
 
-    public function __construct(NftModelRepository $nftModelRepository)
+    public function __construct(NftModelRepository $nftModelRepository,RouterInterface $router)
     {
 
         $this->nftModelRepository = $nftModelRepository;
+        $this->router = $router;
     }
 
 
@@ -27,6 +30,7 @@ class NftImageFixtures extends Fixture implements DependentFixtureInterface
 
         $nftModels = $this->nftModelRepository->findAll();
         $fileSystem = new Filesystem();
+        $folder = '/images/nftImages/';
         $destination = __DIR__ . '/../../public/images/nftImages/';
 
         $init = $this->deleteDir($destination);
@@ -39,9 +43,10 @@ class NftImageFixtures extends Fixture implements DependentFixtureInterface
             );
 
             $nftImage = new NftImage();
+            $path = 'images/nftImages/' . $imageFile->getFilename();
             $nftImage
                 ->setSize($imageFile->getSize())
-                ->setPath($destination . $imageFile->getFilename().'.png')
+                ->setPath($folder . $imageFile->getFilename())
                 ->setName($imageFile->getFilename())
                 ->setNftModel($nftModel);
 

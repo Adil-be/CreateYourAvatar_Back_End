@@ -16,8 +16,8 @@ use ApiPlatform\Metadata\GetCollection;
 
 #[ORM\Entity(repositoryClass: NftValueRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['read']],
-    denormalizationContext: ['groups' => ['write']],
+    normalizationContext: ['groups' => ['NftValue:read']],
+    denormalizationContext: ['groups' => ['NftValue:write']],
     operations: [
         new Get(),
         // new Put(),
@@ -30,15 +30,16 @@ class NftValue
     use HasIdTraits;
 
     #[ORM\Column]
-    #[Groups(['read'])]
+    #[Groups(['NftValue:read'])]
     private ?\DateTimeImmutable $valueDate = null;
 
     #[ORM\Column]
-    #[Groups(['read'])]
+    #[Groups(['NftValue:read'])]
     private ?float $value = null;
 
     #[ORM\ManyToOne(inversedBy: 'NftValues')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['NftValue:read'])]
     private ?Nft $nft = null;
 
 

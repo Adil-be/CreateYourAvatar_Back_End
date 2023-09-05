@@ -19,8 +19,8 @@ use ApiPlatform\Metadata\Put;
 
 #[ORM\Entity(repositoryClass: NftModelRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['read']],
-    denormalizationContext: ['groups' => ['write']],
+    normalizationContext: ['groups' => ['read','NftModel:read']],
+    denormalizationContext: ['groups' => ['NftModel:write']],
     operations: [
         new Get(),
         new Patch(security: "is_granted('ROLE_ADMIN')"),
@@ -44,30 +44,34 @@ class NftModel
 
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['read'])]
+    #[Groups(['NftModel:read'])]
     private ?float $initialPrice = null;
 
     #[ORM\Column]
-    #[Groups(['read'])]
+    #[Groups(['NftModel:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $quantity = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    // #[Groups(['write', 'read'])]
+    #[Groups(['NftModel:write','NftModel:read'])]
     private ?string $description = null;
 
     #[ORM\OneToMany(mappedBy: 'nftModel', targetEntity: Nft::class)]
+    #[Groups(['NftModel:read'])]
     private Collection $nft;
 
     #[ORM\ManyToOne(inversedBy: 'NftModels')]
+    #[Groups(['NftModel:read'])]
     private ?NftCollection $nftCollection = null;
 
     #[ORM\ManyToMany(targetEntity: Category::class, mappedBy: 'nftModels')]
+    #[Groups(['NftModel:read'])]
     private Collection $categories;
 
     #[ORM\OneToMany(mappedBy: 'nftModel', targetEntity: NftImage::class)]
+    #[Groups(['NftModel:read'])]
     private Collection $nftImages;
 
     #[ORM\ManyToOne(inversedBy: 'nftModels')]

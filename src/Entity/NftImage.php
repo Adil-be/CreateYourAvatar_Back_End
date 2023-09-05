@@ -14,33 +14,38 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Put;
 
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\HttpFoundation\File\File;
 
 #[ORM\Entity(repositoryClass: NftImageRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['read']],
-    denormalizationContext: ['groups' => ['write']],
+    normalizationContext: ['groups' => ['read', 'NftImage:read']],
+    denormalizationContext: ['groups' => ['NftImage:write', 'write']],
     operations: [
         new Get(),
-        new Patch(),
-        new Put(),
-        new Delete(),
+        new Patch(security: "is_granted('ROLE_ADMIN')"),
+        new Put(security: "is_granted('ROLE_ADMIN')"),
+        new Delete(security: "is_granted('ROLE_ADMIN')"),
         new GetCollection(),
         new Post(security: "is_granted('ROLE_ADMIN')"),
     ], )]
 class NftImage
 {
+
     use HasIdTraits;
     use HasNameTrait;
+
+    private string $url = 'https://127.0.0.1:8000';
 
     // NOTE: This is not a mapped field of entity metadata, just a simple property.
     #[Vich\UploadableField(mapping: 'nftImages', fileNameProperty: 'name', size: 'size')]
     private ?File $file = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['write', 'read'])]
+    #[Groups(['NftImage:read', 'NftModel:read'])]
     private ?string $path = null;
 
     #[ORM\Column(nullable: true)]
@@ -49,21 +54,19 @@ class NftImage
 
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['read'])]
+    #[Groups(['NftImage:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'nftImages')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['NftImage:read'])]
     private ?NftModel $nftModel = null;
-
-    #[ORM\ManyToOne(inversedBy: 'nftImages')]
-    #[ORM\JoinColumn(nullable: false)]
-
-
 
     public function getPath(): ?string
     {
-        return $this->path;
+
+
+        return $this->url . $this->path;
     }
 
     public function setPath(string $path): static

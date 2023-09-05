@@ -21,7 +21,7 @@ use ApiPlatform\Metadata\Patch;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(
     normalizationContext: ['groups' => ['user:read']],
-    denormalizationContext: ['groups' => ['write']],
+    denormalizationContext: ['groups' => ['user:write']],
     operations: [
         new Get(),
         new Patch(security: "is_granted('ROLE_ADMIN') or object.owner == user"),
@@ -33,10 +33,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
     use HasIdTraits;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['write', 'read','user:read'])]
+    #[Groups(['user:write','user:read'])]
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Groups(['user:read'])]
     private array $roles = [];
 
     /**
@@ -46,7 +47,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
     private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['user:write','read', 'user:read'])]
+    #[Groups(['user:write', 'user:read'])]
     private ?string $username = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -74,6 +75,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
     private Collection $Nfts;
 
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
+    #[Groups(['user:write','user:read'])]
     private ?UserImage $userImage = null;
 
     
