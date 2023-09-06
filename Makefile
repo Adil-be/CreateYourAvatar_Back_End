@@ -13,7 +13,7 @@ start: ## Start the project
 	$(SYMFONY) server:start
 	
 stop: ## Stop the project
-	$(SYMFONY_CONSOLE) server:stop
+	$(SYMFONY) server:stop
 
 db-create: ## Create the database
 	$(SYMFONY_CONSOLE) doctrine:database:create 

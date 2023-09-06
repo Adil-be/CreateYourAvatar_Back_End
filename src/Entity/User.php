@@ -25,7 +25,7 @@ use ApiPlatform\Metadata\Patch;
     operations: [
         new Get(),
         new Patch(security: "is_granted('ROLE_ADMIN') or object.owner == user"),
-        new GetCollection(security:"is_granted('ROLE_ADMIN')"),
+        new GetCollection(security: "is_granted('ROLE_ADMIN')"),
         new Post(),
     ], )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUserInterface
@@ -33,7 +33,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
     use HasIdTraits;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['user:write','user:read'])]
+    #[Groups(['user:write', 'read', 'user:read'])]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -47,8 +47,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
     private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['user:write', 'user:read'])]
-    private ?string $username = null;
+    #[Groups(['user:write', 'read', 'user:read'])]
+    private ?string $username = 'anonymous';
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['user:write', 'user:read'])]
@@ -65,20 +65,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
     #[ORM\Column(nullable: true)]
     #[Groups(['user:write', 'user:read'])]
     private ?\DateTimeImmutable $birthday = null;
-    
+
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['user:write', 'user:read'])]
     private ?string $address = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Nft::class)]
-    #[Groups(['user:write','user:read'])]
+    #[Groups(['user:write', 'user:read'])]
     private Collection $Nfts;
 
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
-    #[Groups(['user:write','user:read'])]
+    #[Groups(['user:write', 'user:read'])]
     private ?UserImage $userImage = null;
 
-    
+
     public function __construct()
     {
         $this->Nfts = new ArrayCollection();
