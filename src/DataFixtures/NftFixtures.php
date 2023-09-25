@@ -42,6 +42,7 @@ class NftFixtures extends Fixture implements DependentFixtureInterface
                     # code...
                     $nft = $this->createNft($nftModel, $user);
                     $nft->setInSale($this->faker->boolean(66));
+                    $nft->setFeatured($this->faker->boolean(20));
                     $manager->persist($nft);
                 }
             }
@@ -52,6 +53,7 @@ class NftFixtures extends Fixture implements DependentFixtureInterface
                 # code...
                 $nft = $this->createNft($nftModel, $toto);
                 $nft->setInSale($this->faker->boolean());
+                $nft->setFeatured($this->faker->boolean(20));
 
                 $manager->persist($nft);
             }
@@ -63,7 +65,7 @@ class NftFixtures extends Fixture implements DependentFixtureInterface
     {
         $nft = new Nft();
         $nft->setBuyingPrice($nftModel->getInitialPrice());
-        $nft->setPurchaseDate(new \DateTimeImmutable);
+        $nft->setPurchaseDate(\DateTimeImmutable::createFromMutable($this->faker->dateTime()));
         $nft->setSellingPrice($nftModel->getInitialPrice());
         $nft->setToken($this->faker->md5());
         $nft->setNftModel($nftModel);

@@ -19,15 +19,15 @@ use ApiPlatform\Metadata\Put;
 
 #[ORM\Entity(repositoryClass: NftModelRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['read','NftModel:read']],
+    normalizationContext: ['groups' => ['read', 'NftModel:read']],
     denormalizationContext: ['groups' => ['NftModel:write']],
     operations: [
         new Get(),
         new Patch(security: "is_granted('ROLE_ADMIN')"),
-        new Put(security:"is_granted('ROLE_ADMIN')"),
-        new Delete(security:"is_granted('ROLE_ADMIN')"),
+        new Put(security: "is_granted('ROLE_ADMIN')"),
+        new Delete(security: "is_granted('ROLE_ADMIN')"),
         new GetCollection(),
-        new Post(security:"is_granted('ROLE_ADMIN')"),
+        new Post(security: "is_granted('ROLE_ADMIN')"),
     ], )]
 class NftModel
 {
@@ -55,7 +55,7 @@ class NftModel
     private ?int $quantity = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['NftModel:write','NftModel:read'])]
+    #[Groups(['NftModel:write', 'NftModel:read'])]
     private ?string $description = null;
 
     #[ORM\OneToMany(mappedBy: 'nftModel', targetEntity: Nft::class)]
@@ -89,6 +89,11 @@ class NftModel
         return $this;
     }
 
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;

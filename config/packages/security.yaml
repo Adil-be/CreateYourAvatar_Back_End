@@ -22,6 +22,7 @@ security:
       pattern: ^/api/login
       stateless: true
       provider: app_user_provider
+      # anonymous: true
       json_login:
         check_path: /api/login
         success_handler: lexik_jwt_authentication.handler.authentication_success
@@ -32,9 +33,14 @@ security:
       provider: jwt
       jwt: ~
 
-    main:
-      lazy: true
-      provider: app_user_provider
+    # main:
+    #   lazy: true
+    #   provider: app_user_provider
+    #   custom_authenticator: App\Security\AppDefaultAuthenticator
+    #   logout:
+    #     path: app_logout
+        # where to redirect after logout
+        # target: app_any_route
       # custom_authenticator: App\Security\Authenticator
 
       # activate different ways to authenticate
