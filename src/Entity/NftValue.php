@@ -37,7 +37,7 @@ class NftValue
     #[Groups(['NftValue:read'])]
     private ?float $value = null;
 
-    #[ORM\ManyToOne(inversedBy: 'NftValues')]
+    #[ORM\ManyToOne(inversedBy: 'nftValues')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['NftValue:read'])]
     private ?Nft $nft = null;

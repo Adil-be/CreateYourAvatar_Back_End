@@ -21,11 +21,11 @@ use ApiPlatform\Metadata\Patch;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['user:read']],
-    denormalizationContext: ['groups' => ['user:write']],
+    normalizationContext: ['groups' => ['user:read', 'read']],
+    // denormalizationContext: ['groups' => ['user:write']],
     operations: [
         new Get(),
-        new Patch(security: "is_granted('ROLE_ADMIN') or object.owner == user"),
+        new Patch(security: "is_granted('ROLE_ADMIN') or object == user"),
         new GetCollection(security: "is_granted('ROLE_ADMIN')"),
         new Post(),
     ], )]
@@ -73,7 +73,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Nft::class)]
     #[Groups(['user:write', 'user:read'])]
-    private Collection $Nfts;
+    private Collection $nfts;
 
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     #[Groups(['user:write', 'user:read'])]
@@ -222,13 +222,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
      */
     public function getNfts(): Collection
     {
-        return $this->Nfts;
+        return $this->nfts;
     }
 
     public function addNft(Nft $nft): static
     {
-        if (!$this->Nfts->contains($nft)) {
-            $this->Nfts->add($nft);
+        if (!$this->nfts->contains($nft)) {
+            $this->nfts->add($nft);
             $nft->setUser($this);
         }
 
@@ -237,7 +237,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
 
     public function removeNft(Nft $nft): static
     {
-        if ($this->Nfts->removeElement($nft)) {
+        if ($this->nfts->removeElement($nft)) {
             // set the owning side to null (unless already changed)
             if ($nft->getUser() === $this) {
                 $nft->setUser(null);

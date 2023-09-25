@@ -2,6 +2,12 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\NumericFilter;
+use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\HasIdTraits;
 use App\Repository\NftRepository;
@@ -19,8 +25,8 @@ use ApiPlatform\Metadata\Put;
 
 #[ORM\Entity(repositoryClass: NftRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['nft:read','read']],
-    denormalizationContext: ['groups' => ['nft:write','write']],
+    normalizationContext: ['groups' => ['nft:read', 'read']],
+    denormalizationContext: ['groups' => ['nft:write', 'write']],
     operations: [
         new Get(),
         new Patch(security: "is_granted('ROLE_ADMIN') or object.owner == user"),
@@ -28,7 +34,18 @@ use ApiPlatform\Metadata\Put;
         new Delete(security: "is_granted('ROLE_ADMIN') or object.owner == user"),
         new GetCollection(),
         new Post(security: "is_granted('ROLE_ADMIN')"),
-    ], )]
+    ],
+    paginationItemsPerPage: 20,
+    paginationClientItemsPerPage: true
+     )]
+
+#[ApiFilter(OrderFilter::class, properties: ['sellingPrice'], arguments: ['orderParameterName' => 'order'])]
+#[ApiFilter(BooleanFilter::class, properties: ['inSale'])]
+#[ApiFilter(BooleanFilter::class, properties: ['featured'])]
+#[ApiFilter(OrderFilter::class, properties: ['nftModel.createdAt'])]
+#[ApiFilter(NumericFilter::class, properties: ['user.id'])]
+#[ApiFilter(RangeFilter::class, properties: ['sellingPrice'])]
+#[ApiFilter(SearchFilter::class, properties: ['nftModel.name' => 'partial', 'nftModel.description' => 'partial'])]
 class Nft
 {
     use HasIdTraits;
@@ -55,15 +72,19 @@ class Nft
 
     #[ORM\OneToMany(mappedBy: 'nft', targetEntity: NftValue::class)]
     #[Groups(['nft:read'])]
-    private Collection $NftValues;
+    private Collection $nftValues;
 
     #[ORM\ManyToOne(inversedBy: 'nft')]
     #[Groups(['nft:read'])]
     private ?NftModel $nftModel = null;
 
-    #[ORM\ManyToOne(inversedBy: 'Nfts')]
+    #[ORM\ManyToOne(inversedBy: 'nfts')]
     #[Groups(['nft:read'])]
     private ?User $user = null;
+
+    #[ORM\Column]
+    #[Groups(['nft:write', 'nft:read'])]
+    private ?bool $featured = null;
 
 
 
@@ -126,13 +147,13 @@ class Nft
      */
     public function getNftValues(): Collection
     {
-        return $this->NftValues;
+        return $this->nftValues;
     }
 
     public function addNftValue(NftValue $nftValue): static
     {
-        if (!$this->NftValues->contains($nftValue)) {
-            $this->NftValues->add($nftValue);
+        if (!$this->nftValues->contains($nftValue)) {
+            $this->nftValues->add($nftValue);
             $nftValue->setNft($this);
         }
 
@@ -141,7 +162,7 @@ class Nft
 
     public function removeNftValue(NftValue $nftValue): static
     {
-        if ($this->NftValues->removeElement($nftValue)) {
+        if ($this->nftValues->removeElement($nftValue)) {
             // set the owning side to null (unless already changed)
             if ($nftValue->getNft() === $this) {
                 $nftValue->setNft(null);
@@ -184,6 +205,18 @@ class Nft
     public function setSellingPrice(?float $sellingPrice): static
     {
         $this->sellingPrice = $sellingPrice;
+
+        return $this;
+    }
+
+    public function isFeatured(): ?bool
+    {
+        return $this->featured;
+    }
+
+    public function setFeatured(bool $featured): static
+    {
+        $this->featured = $featured;
 
         return $this;
     }
