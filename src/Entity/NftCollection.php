@@ -24,7 +24,6 @@ use ApiPlatform\Metadata\Put;
     operations: [
         new Get(),
         new Patch(security: "is_granted('ROLE_ADMIN')"),
-        new Put(security: "is_granted('ROLE_ADMIN')"),
         new Delete(security: "is_granted('ROLE_ADMIN')"),
         new GetCollection(),
         new Post(security: "is_granted('ROLE_ADMIN')"),
@@ -34,6 +33,7 @@ class NftCollection
     use HasIdTraits;
     use HasNameTrait;
 
+
     #[ORM\OneToMany(mappedBy: 'nftCollection', targetEntity: NftModel::class)]
     #[Groups(['NftCollection:read'])]
     private Collection $NftModels;
@@ -41,6 +41,9 @@ class NftCollection
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['NftCollection:write', 'NftCollection:read'])]
     private ?string $path = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $description = null;
 
     public function __construct()
     {
@@ -80,12 +83,24 @@ class NftCollection
 
     public function getPath(): ?string
     {
-        return $this->path;
+        return  $this->path;
     }
 
     public function setPath(?string $path): static
     {
         $this->path = $path;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }

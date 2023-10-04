@@ -14,8 +14,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Put;
 
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
+
 use Symfony\Component\Serializer\Annotation\Groups;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\HttpFoundation\File\File;
@@ -37,8 +36,6 @@ class NftImage
 
     use HasIdTraits;
     use HasNameTrait;
-
-    private string $url = 'https://127.0.0.1:8000';
 
     // NOTE: This is not a mapped field of entity metadata, just a simple property.
     #[Vich\UploadableField(mapping: 'nftImages', fileNameProperty: 'name', size: 'size')]
@@ -64,9 +61,7 @@ class NftImage
 
     public function getPath(): ?string
     {
-
-
-        return $this->url . $this->path;
+        return  $this->path;
     }
 
     public function setPath(string $path): static

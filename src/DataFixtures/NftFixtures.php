@@ -39,7 +39,7 @@ class NftFixtures extends Fixture implements DependentFixtureInterface
             foreach ($nftModels as $nftModel) {
                 $max = $this->faker->numberBetween(1, 2);
                 for ($i = 0; $i < $max; $i++) {
-                    # code...
+        
                     $nft = $this->createNft($nftModel, $user);
                     $nft->setInSale($this->faker->boolean(66));
                     $nft->setFeatured($this->faker->boolean(20));
@@ -66,7 +66,7 @@ class NftFixtures extends Fixture implements DependentFixtureInterface
         $nft = new Nft();
         $nft->setBuyingPrice($nftModel->getInitialPrice());
         $nft->setPurchaseDate(\DateTimeImmutable::createFromMutable($this->faker->dateTime()));
-        $nft->setSellingPrice($nftModel->getInitialPrice());
+        $nft->setSellingPrice($this->faker->randomFloat(2, 0, 2));
         $nft->setToken($this->faker->md5());
         $nft->setNftModel($nftModel);
         $nft->setUser($user);

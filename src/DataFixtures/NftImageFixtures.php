@@ -43,7 +43,6 @@ class NftImageFixtures extends Fixture implements DependentFixtureInterface
             );
 
             $nftImage = new NftImage();
-            $path = 'images/nftImages/' . $imageFile->getFilename();
             $nftImage
                 ->setSize($imageFile->getSize())
                 ->setPath($folder . $imageFile->getFilename())

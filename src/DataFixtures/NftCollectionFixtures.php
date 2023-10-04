@@ -8,20 +8,25 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Faker;
 
 class NftCollectionFixtures extends Fixture
 {
     private NftModelRepository $nftModelRepository;
 
+    private Faker\Generator $faker;
+
     public function __construct(NftModelRepository $nftModelRepository)
     {
         $this->nftModelRepository = $nftModelRepository;
+        $this->faker = Faker\Factory::create('fr_FR');
     }
     public function load(ObjectManager $manager): void
     {
 
         $fileSystem = new Filesystem();
         $destination = __DIR__ . '/../../public/images/collectionImages/';
+        $folder = 'images/collectionImages/';
         $collections = ['SteamPunk', 'HeroicFantasy', 'CyberTech'];
 
         $init = $this->deleteDir($destination);
@@ -29,8 +34,9 @@ class NftCollectionFixtures extends Fixture
 
         foreach ($collections as $collectionName) {
             $nftCollection = new NftCollection();
-            $nftCollection->setName($collectionName);
-            $nftCollection->setPath($destination . $nftCollection->getName() . '.jpg');
+            $nftCollection->setName($collectionName)
+                ->setDescription($this->faker->text())
+                ->setPath($folder . $nftCollection->getName());
 
             $imageFile = $this->createImage($nftCollection->getName());
             $fileSystem->copy(
