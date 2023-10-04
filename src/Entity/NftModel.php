@@ -24,7 +24,7 @@ use ApiPlatform\Metadata\Put;
     operations: [
         new Get(),
         new Patch(security: "is_granted('ROLE_ADMIN')"),
-        new Put(security: "is_granted('ROLE_ADMIN')"),
+        // new Put(security: "is_granted('ROLE_ADMIN')"),
         new Delete(security: "is_granted('ROLE_ADMIN')"),
         new GetCollection(),
         new Post(security: "is_granted('ROLE_ADMIN')"),

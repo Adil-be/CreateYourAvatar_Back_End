@@ -29,20 +29,19 @@ use ApiPlatform\Metadata\Put;
     denormalizationContext: ['groups' => ['nft:write', 'write']],
     operations: [
         new Get(),
-        new Patch(security: "is_granted('ROLE_ADMIN') or object.owner == user"),
-        new Put(security: "is_granted('ROLE_ADMIN') or object.owner == user"),
-        new Delete(security: "is_granted('ROLE_ADMIN') or object.owner == user"),
+        new Patch(security: "is_granted('ROLE_ADMIN') or object.user == user"),
+        // new Put(security: "is_granted('ROLE_ADMIN') or object.user == user"),
+        new Delete(security: "is_granted('ROLE_ADMIN') or object.user == user"),
         new GetCollection(),
         new Post(security: "is_granted('ROLE_ADMIN')"),
     ],
     paginationItemsPerPage: 20,
     paginationClientItemsPerPage: true
-     )]
+)]
 
-#[ApiFilter(OrderFilter::class, properties: ['sellingPrice'], arguments: ['orderParameterName' => 'order'])]
-#[ApiFilter(BooleanFilter::class, properties: ['inSale'])]
-#[ApiFilter(BooleanFilter::class, properties: ['featured'])]
-#[ApiFilter(OrderFilter::class, properties: ['nftModel.createdAt'])]
+
+#[ApiFilter(BooleanFilter::class, properties: ['inSale','featured'])]
+#[ApiFilter(OrderFilter::class, properties: ['sellingPrice','nftModel.createdAt','purchaseDate'])]
 #[ApiFilter(NumericFilter::class, properties: ['user.id'])]
 #[ApiFilter(RangeFilter::class, properties: ['sellingPrice'])]
 #[ApiFilter(SearchFilter::class, properties: ['nftModel.name' => 'partial', 'nftModel.description' => 'partial'])]

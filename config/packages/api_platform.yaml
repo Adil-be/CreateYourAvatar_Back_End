@@ -11,3 +11,6 @@ api_platform:
         type: header
   title: 'Digital Avatar'
   description: 'Create your own avatar'
+  defaults:
+        extra_properties:
+            standard_put: true
