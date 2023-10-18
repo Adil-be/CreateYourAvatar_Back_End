@@ -29,34 +29,59 @@ class NftFixtures extends Fixture implements DependentFixtureInterface
     public function load(ObjectManager $manager): void
     {
         $nftModels = $this->nftModelRepository->findAll();
-        $admin = $this->userRepository->findOneBy(['email' => 'adil-b@gmail.com']);
+        $admin = $this->userRepository->findOneBy(['email' => 'adel-b@gmail.com']);
         $taty = $this->userRepository->findOneBy(['email' => 'TatyJosy@gmail.com']);
         $toto = $this->userRepository->findOneBy(['email' => 'toto@gmail.com']);
 
         $users = [$taty, $admin];
+        $nfts = [];
 
         foreach ($users as $user) {
             foreach ($nftModels as $nftModel) {
+                if ($nftModel->getQuantity() <= 0 || $nftModel->getQuantity() == null) {
+                    continue;
+                }
                 $max = $this->faker->numberBetween(1, 2);
                 for ($i = 0; $i < $max; $i++) {
-        
-                    $nft = $this->createNft($nftModel, $user);
-                    $nft->setInSale($this->faker->boolean(66));
-                    $nft->setFeatured($this->faker->boolean(20));
-                    $manager->persist($nft);
+                    if ($nftModel->getQuantity() <= 0 || $nftModel->getQuantity() == null) {
+                        continue;
+                    } else {
+
+                        $nft = $this->createNft($nftModel, $user);
+                        $nft->setInSale($this->faker->boolean(66));
+                        $nft->setFeatured($this->faker->boolean(20));
+                        $nftModel->setQuantity($nftModel->getQuantity() - 1);
+                        $nfts[] = $nft;
+                    }
+                    // $manager->persist($nft);
                 }
             }
         }
         foreach ($nftModels as $nftModel) {
+            if ($nftModel->getQuantity() <= 0 || $nftModel->getQuantity() == null) {
+                continue;
+            }
             $max = $this->faker->numberBetween(0, 1);
             for ($i = 0; $i < $max; $i++) {
                 # code...
-                $nft = $this->createNft($nftModel, $toto);
-                $nft->setInSale($this->faker->boolean());
-                $nft->setFeatured($this->faker->boolean(20));
+                if ($nftModel->getQuantity() <= 0 || $nftModel->getQuantity() == null) {
+                    continue;
+                } else {
 
-                $manager->persist($nft);
+
+
+                    $nft = $this->createNft($nftModel, $toto);
+                    $nft->setInSale($this->faker->boolean());
+                    $nft->setFeatured($this->faker->boolean(20));
+                    $nftModel->setQuantity($nftModel->getQuantity() - 1);
+                    $nfts[] = $nft;
+                    // $manager->persist($nft);
+                }
             }
+        }
+        shuffle($nfts);
+        foreach ($nfts as $nft) {
+            $manager->persist($nft);
         }
         $manager->flush();
     }
@@ -66,7 +91,7 @@ class NftFixtures extends Fixture implements DependentFixtureInterface
         $nft = new Nft();
         $nft->setBuyingPrice($nftModel->getInitialPrice());
         $nft->setPurchaseDate(\DateTimeImmutable::createFromMutable($this->faker->dateTime()));
-        $nft->setSellingPrice($this->faker->randomFloat(2, 0, 2));
+        $nft->setSellingPrice($this->faker->randomFloat(2, 0, 10));
         $nft->setToken($this->faker->md5());
         $nft->setNftModel($nftModel);
         $nft->setUser($user);

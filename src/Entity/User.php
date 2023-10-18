@@ -2,12 +2,12 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Action\PlaceholderAction;
 use ApiPlatform\Metadata\ApiResource;
-use App\Entity\Traits\HasIdTraits;
+use App\Controller\PostImageUserController;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Lexik\Bundle\JWTAuthenticationBundle\Security\User\JWTUserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -19,26 +19,59 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 
+
+
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['user:read', 'read']],
-    // denormalizationContext: ['groups' => ['user:write']],
     operations: [
-        new Get(),
-        new Patch(security: "is_granted('ROLE_ADMIN') or object == user"),
-        new GetCollection(security: "is_granted('ROLE_ADMIN')"),
-        new Post(),
+        new Patch(
+            security: "is_granted('ROLE_ADMIN') or object == user",
+            securityMessage: 'Sorry, but you are not the user.',
+            denormalizationContext: ['groups' => ['user:write']]
+        ),
+        new Post(
+            denormalizationContext: ['groups' => ['user:write']]
+        ),
+        new GetCollection(
+            normalizationContext: ['groups' => ['user:collection:get']]
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['user:read']]
+        ),
+        new Get(
+            name: 'AuthenticatedUser',
+            uriTemplate: '/user_auth/{id}',
+            controller: PlaceholderAction::class,
+            security: "is_granted('ROLE_ADMIN') or object == user",
+            normalizationContext: ['groups' => ['user_auth:read']]
+        ),
+        // new Post(name: 'imageUser', uriTemplate: '/users/{id}/image', controller: PostImageUserController::class),
     ], )]
+
 class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUserInterface
 {
-    use HasIdTraits;
+    public function __construct()
+    {
+        $this->Nfts = new ArrayCollection();
+    }
+
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    #[Groups(['read', 'user:read', 'user:collection:get', 'user_auth:read', 'nft:read:full'])]
+    private ?int $id = null;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['user:write', 'read', 'user:read'])]
+    #[Groups(['user:write', 'read', 'user:read', 'user:collection:get', 'user_auth:read', 'nft:read:full'])]
     private ?string $email = null;
 
     #[ORM\Column]
-    #[Groups(['user:read'])]
+    #[Groups(['user_auth:read'])]
     private array $roles = [];
 
     /**
@@ -48,42 +81,40 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
     private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['user:write', 'read', 'user:read'])]
+    #[Groups(['user_auth:write', 'user:read', 'user:collection:get', 'user_auth:read', 'nft:read:full'])]
     private ?string $username = 'anonymous';
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['user:write', 'user:read'])]
+    #[Groups(['user:write', 'user:read', 'user_auth:read'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['user:write', 'user:read'])]
+    #[Groups(['user:write', 'user:read', 'user_auth:read'])]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['user:write', 'user:read'])]
-    private ?string $gender = null;
+    #[Groups(['user:write', 'user_auth:read'])]
+    private ?string $gender = 'male';
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['user:write', 'user:read'])]
+    #[Groups(['user:write', 'user_auth:read'])]
     private ?\DateTimeImmutable $birthday = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['user:write', 'user:read'])]
+    #[Groups(['user:write', 'user_auth:read'])]
     private ?string $address = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Nft::class)]
-    #[Groups(['user:write', 'user:read'])]
+    #[Groups(['user_auth:read', 'user:collection:get', 'user:read'])]
     private Collection $nfts;
 
-    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
-    #[Groups(['user:write', 'user:read'])]
+    #[ORM\OneToOne(targetEntity: UserImage::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['user:write', 'user:read', 'user_auth:read', 'user:collection:get', 'nft:read:full'])]
     private ?UserImage $userImage = null;
 
 
-    public function __construct()
-    {
-        $this->Nfts = new ArrayCollection();
-    }
+
 
     public function setId(?int $id): self
     {
@@ -255,9 +286,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
     public function setUserImage(UserImage $userImage): static
     {
         // set the owning side of the relation if necessary
-        if ($userImage->getUser() !== $this) {
-            $userImage->setUser($this);
-        }
+        // if ($userImage->getUser() !== $this) {
+        //     $userImage->setUser($this);
+        // }
 
         $this->userImage = $userImage;
 

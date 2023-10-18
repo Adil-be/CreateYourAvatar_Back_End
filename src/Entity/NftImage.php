@@ -31,18 +31,41 @@ use Symfony\Component\HttpFoundation\File\File;
         new GetCollection(),
         new Post(security: "is_granted('ROLE_ADMIN')"),
     ], )]
+#[Vich\Uploadable]
 class NftImage
 {
 
-    use HasIdTraits;
-    use HasNameTrait;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    #[Groups(['NftImage:read'])]
+    private ?int $id = null;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['NftImage:write', 'NftImage:read'])]
+    private ?string $name = null;
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
 
     // NOTE: This is not a mapped field of entity metadata, just a simple property.
     #[Vich\UploadableField(mapping: 'nftImages', fileNameProperty: 'name', size: 'size')]
     private ?File $file = null;
 
-    #[ORM\Column(length: 255)]
-    #[Groups(['NftImage:read', 'NftModel:read'])]
+    #[Groups(['NftImage:read', 'NftModel:read','nft:read:full'])]
     private ?string $path = null;
 
     #[ORM\Column(nullable: true)]

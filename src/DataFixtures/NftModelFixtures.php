@@ -121,6 +121,8 @@ class NftModelFixtures extends Fixture implements DependentFixtureInterface
             $model = new NftModel();
             $model->setName($modelName)
                 ->setNftCollection($collection)
+                ->setFeatured($this->faker->boolean(20))
+                ->setQuantity(7 + $this->faker->randomNumber(0))
                 ->setDescription($this->faker->text())
                 ->setInitialPrice($this->faker->randomFloat(2, 0, 2))
                 ->setCreatedAt(\DateTimeImmutable::createFromMutable($this->faker->dateTime()));

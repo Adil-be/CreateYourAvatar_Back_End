@@ -40,7 +40,7 @@ class NftValue
     #[ORM\ManyToOne(inversedBy: 'nftValues')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['NftValue:read'])]
-    private ?Nft $nft = null;
+    private ?NftModel $nftModel = null;
 
 
     public function getValueDate(): ?\DateTimeImmutable
@@ -67,14 +67,14 @@ class NftValue
         return $this;
     }
 
-    public function getNft(): ?Nft
+    public function getNftModel(): ?Nft
     {
-        return $this->nft;
+        return $this->nftModel;
     }
 
-    public function setNft(?Nft $nft): static
+    public function setNftModel(?NftModel $nftModel): static
     {
-        $this->nft = $nft;
+        $this->nft = $nftModel;
 
         return $this;
     }

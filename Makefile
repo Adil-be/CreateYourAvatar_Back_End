@@ -22,6 +22,9 @@ db-create: ## Create the database
 db-drop: ## Drop the database
 	$(SYMFONY_CONSOLE) doctrine:database:drop --if-exists --force 
 
+migration:
+	${SYMFONY_CONSOLE} make:migration
+
 migrate: ## Migrate the database
 	$(SYMFONY_CONSOLE) doctrine:migrations:migrate -n
 
@@ -33,3 +36,6 @@ regenerate:
 	$(MAKE) db-create
 	$(MAKE) migrate
 	$(MAKE) fixtures
+
+clear-cache:
+	${SYMFONY_CONSOLE} cache:pool:clear --all
