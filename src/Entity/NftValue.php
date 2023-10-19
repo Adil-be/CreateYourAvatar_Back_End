@@ -2,16 +2,16 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Put;
 use App\Entity\Traits\HasIdTraits;
 use App\Repository\NftValueRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\NumericFilter;
 
 
 #[ORM\Entity(repositoryClass: NftValueRepository::class)]
@@ -20,11 +20,14 @@ use ApiPlatform\Metadata\GetCollection;
     denormalizationContext: ['groups' => ['NftValue:write']],
     operations: [
         new Get(),
-        // new Put(),
-        // new Delete(),
         new GetCollection(),
-        // new Post(),
-    ], )]
+    ],
+    paginationItemsPerPage: 7,
+    paginationClientItemsPerPage: true )]
+
+#[ApiFilter(NumericFilter::class, properties: ['nftModel.id'])]
+#[ApiFilter(OrderFilter::class, properties: ['valueDate'=> 'DESC'])]
+
 class NftValue
 {
     use HasIdTraits;
@@ -67,14 +70,14 @@ class NftValue
         return $this;
     }
 
-    public function getNftModel(): ?Nft
+    public function getNftModel(): ?NftModel
     {
         return $this->nftModel;
     }
 
     public function setNftModel(?NftModel $nftModel): static
     {
-        $this->nft = $nftModel;
+        $this->nftModel = $nftModel;
 
         return $this;
     }
