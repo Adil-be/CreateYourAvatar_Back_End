@@ -9,47 +9,126 @@ use App\Repository\NftCollectionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Put;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use App\Controller\PostImageCollectionController;
+
+
 
 #[ORM\Entity(repositoryClass: NftCollectionRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['NftCollection:read', 'read']],
-    denormalizationContext: ['groups' => ['NftCollection:write', 'write']],
     operations: [
-        new Get(),
-        new Patch(security: "is_granted('ROLE_ADMIN')"),
-        new Delete(security: "is_granted('ROLE_ADMIN')"),
-        new GetCollection(),
+        new Get(
+            normalizationContext: ['groups' => ['NftCollection:read', 'read']],
+        ),
+        new Patch(
+            security: "is_granted('ROLE_ADMIN')",
+            denormalizationContext: ['groups' => ['NftCollection:write', 'write']]
+        ),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
+        new GetCollection(
+            normalizationContext: ['groups' => ['NftCollection:read', 'read']],
+        ),
         new Post(security: "is_granted('ROLE_ADMIN')"),
+        new Post(
+            name: 'nft_collections_image',
+            uriTemplate: '/nft_collections/{id}/image',
+            controller: PostImageCollectionController::class,
+            deserialize: false
+        ),
     ], )]
+#[Vich\Uploadable]
 class NftCollection
 {
-    use HasIdTraits;
-    use HasNameTrait;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    #[Groups(['NftCollection:read', 'nft:read:full'])]
+    private ?int $id = null;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['NftCollection:write', 'NftCollection:read', 'nft:read:full'])]
+    private ?string $name = null;
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function __construct()
+    {
+        $this->NftModels = new ArrayCollection();
+        $this->updatedAt = new \DateTimeImmutable();
+    }
 
 
     #[ORM\OneToMany(mappedBy: 'nftCollection', targetEntity: NftModel::class)]
     #[Groups(['NftCollection:read'])]
     private Collection $NftModels;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['NftCollection:write', 'NftCollection:read'])]
+
+    #[Groups(['NftCollection:write', 'NftCollection:read', 'nft:read:full'])]
     private ?string $path = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['NftCollection:write', 'NftCollection:read', 'nft:read:full'])]
     private ?string $description = null;
 
-    public function __construct()
+    #[ORM\Column(nullable: true)]
+    private ?string $imageName = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $imageSize = null;
+
+    #[Vich\UploadableField(mapping: 'collectionImages', fileNameProperty: 'imageName', size: 'imageSize')]
+    private ?File $file = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $updatedAt = null;
+
+    /**
+     * If manually uploading a file (i.e. not using Symfony Form) ensure an instance
+     * of 'UploadedFile' is injected into this setter to trigger the update. If this
+     * bundle's configuration parameter 'inject_on_load' is set to 'true' this setter
+     * must be able to accept an instance of 'File' as the bundle will inject one here
+     * during Doctrine hydration.
+     *
+     * @param File|\Symfony\Component\HttpFoundation\File\UploadedFile|null $file
+     */
+    public function setFile(?File $imageFile = null): void
     {
-        $this->NftModels = new ArrayCollection();
+        $this->file = $imageFile;
+
+        if (null !== $imageFile) {
+            // It is required that at least one field changes if you are using doctrine
+            // otherwise the event listeners won't be called and the file is lost
+            $this->updatedAt = new \DateTimeImmutable();
+        }
     }
 
+    public function getFile(): ?File
+    {
+        return $this->file;
+    }
 
     /**
      * @return Collection<int, NftModel>
@@ -83,7 +162,7 @@ class NftCollection
 
     public function getPath(): ?string
     {
-        return  $this->path;
+        return $this->path;
     }
 
     public function setPath(?string $path): static
@@ -104,4 +183,36 @@ class NftCollection
 
         return $this;
     }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+    public function setImageName(?string $imageName): void
+    {
+        $this->imageName = $imageName;
+    }
+
+    public function getImageName(): ?string
+    {
+        return $this->imageName;
+    }
+
+    public function setImageSize(?int $imageSize): void
+    {
+        $this->imageSize = $imageSize;
+    }
+
+    public function getImageSize(): ?int
+    {
+        return $this->imageSize;
+    }
+
 }

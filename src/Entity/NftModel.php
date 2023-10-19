@@ -2,9 +2,14 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiFilter;
+
 use ApiPlatform\Metadata\ApiResource;
-use App\Entity\Traits\HasIdTraits;
-use App\Entity\Traits\HasNameTrait;
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\NumericFilter;
+use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\NftModelRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -19,7 +24,7 @@ use ApiPlatform\Metadata\Put;
 
 #[ORM\Entity(repositoryClass: NftModelRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['read', 'NftModel:read']],
+    normalizationContext: ['groups' => ['NftModel:read']],
     denormalizationContext: ['groups' => ['NftModel:write']],
     operations: [
         new Get(),
@@ -28,34 +33,50 @@ use ApiPlatform\Metadata\Put;
         new Delete(security: "is_granted('ROLE_ADMIN')"),
         new GetCollection(),
         new Post(security: "is_granted('ROLE_ADMIN')"),
-    ], )]
+
+    ],
+    paginationItemsPerPage: 20,
+    paginationClientItemsPerPage: true)]
+
+#[ApiFilter(BooleanFilter::class, properties: ['featured'])]
+#[ApiFilter(OrderFilter::class, properties: ['initialPrice', 'createdAt'])]
+#[ApiFilter(NumericFilter::class, properties: ['user.id'])]
+#[ApiFilter(RangeFilter::class, properties: ['sellingPrice'])]
+#[ApiFilter(SearchFilter::class, properties: ['nftModel.name' => 'partial', 'nftModel.description' => 'partial'])]
 class NftModel
 {
-    use HasIdTraits;
-    use HasNameTrait;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    #[Groups(['NftModel:read', 'nft:read:full'])]
+    private ?int $id = null;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['NftModel:write', 'NftModel:read', 'nft:read:full'])]
+    private ?string $name = null;
 
     public function __construct()
     {
         $this->nft = new ArrayCollection();
+        $this->nftValues = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->nftImages = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable;
     }
 
-
     #[ORM\Column(nullable: true)]
-    #[Groups(['NftModel:read'])]
+    #[Groups(['NftModel:read', 'nft:read:full'])]
     private ?float $initialPrice = null;
 
     #[ORM\Column]
-    #[Groups(['NftModel:read'])]
+    #[Groups(['NftModel:read', 'nft:read:full'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $quantity = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['NftModel:write', 'NftModel:read'])]
+    #[Groups(['NftModel:write', 'NftModel:read', 'nft:read:full'])]
     private ?string $description = null;
 
     #[ORM\OneToMany(mappedBy: 'nftModel', targetEntity: Nft::class)]
@@ -63,19 +84,41 @@ class NftModel
     private Collection $nft;
 
     #[ORM\ManyToOne(inversedBy: 'NftModels')]
-    #[Groups(['NftModel:read'])]
+    #[Groups(['NftModel:read', 'nft:read:full'])]
     private ?NftCollection $nftCollection = null;
 
     #[ORM\ManyToMany(targetEntity: Category::class, mappedBy: 'nftModels')]
-    #[Groups(['NftModel:read'])]
+    #[Groups(['NftModel:read', 'nft:read:full'])]
     private Collection $categories;
 
     #[ORM\OneToMany(mappedBy: 'nftModel', targetEntity: NftImage::class)]
-    #[Groups(['NftModel:read'])]
+    #[Groups(['NftModel:read', 'nft:read:full'])]
     private Collection $nftImages;
 
-    #[ORM\ManyToOne(inversedBy: 'nftModels')]
+    #[ORM\OneToMany(mappedBy: 'nftModel', targetEntity: NftValue::class)]
+    #[Groups(['NftModel:read'])]
+    private Collection $nftValues;
 
+    #[ORM\Column]
+    #[Groups(['NftModel:read'])]
+    private ?bool $featured = null;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
 
     public function getInitialPrice(): ?float
     {
@@ -216,6 +259,48 @@ class NftModel
             // set the owning side to null (unless already changed)
             if ($nftImage->getNftModel() === $this) {
                 $nftImage->setNftModel(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function isFeatured(): ?bool
+    {
+        return $this->featured;
+    }
+
+    public function setFeatured(bool $featured): static
+    {
+        $this->featured = $featured;
+
+        return $this;
+    }
+
+        /**
+     * @return Collection<int, NftValue>
+     */
+    public function getNftValues(): Collection
+    {
+        return $this->nftValues;
+    }
+
+    public function addNftValue(NftValue $nftValue): static
+    {
+        if (!$this->nftValues->contains($nftValue)) {
+            $this->nftValues->add($nftValue);
+            $nftValue->setNftModel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNftValue(NftValue $nftValue): static
+    {
+        if ($this->nftValues->removeElement($nftValue)) {
+            // set the owning side to null (unless already changed)
+            if ($nftValue->getNftModel() === $this) {
+                $nftValue->setNftModel(null);
             }
         }
 

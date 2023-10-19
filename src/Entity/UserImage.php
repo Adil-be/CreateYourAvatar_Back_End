@@ -2,20 +2,65 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\UserImageRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use App\Controller\PostImageUserController;
+use ApiPlatform\OpenApi\Model;
 
 #[ORM\Entity(repositoryClass: UserImageRepository::class)]
+#[ApiResource(operations: [
+    new Get(normalizationContext: ['groups' => ['image:read']]),
+    new Post(
+        name: 'imageUser',
+        uriTemplate: '/image/user/{id}',
+        controller: PostImageUserController::class,
+        deserialize: false,
+        validationContext: ['groups' => ['user_image_post']],
+        openapi: new Model\Operation(
+            requestBody: new Model\RequestBody(
+                content: new \ArrayObject([
+                    'multipart/form-data' => [
+                        'schema' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'file' => [
+                                    'type' => 'string',
+                                    'format' => 'binary'
+                                ]
+                            ]
+                        ]
+                    ]
+                ])
+            )
+        )
+    )
+])]
+
+#[Vich\Uploadable]
 class UserImage
 {
+
+    public function __construct()
+    {
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['user:read', 'nft:read:full', 'user:collection:get'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+
+    #[Groups(['user:read', 'nft:read:full', 'user:collection:get', 'user_auth:read'])]
     private ?string $path = null;
 
     #[ORM\Column(nullable: true)]
@@ -27,12 +72,13 @@ class UserImage
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\OneToOne(inversedBy: 'userImage', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
+    // #[ORM\OneToOne(inversedBy: 'userImage', cascade: ['persist', 'remove'])]
+    // #[ORM\JoinColumn(nullable: false)]
+    // private ?User $user = null;
 
     // NOTE: This is not a mapped field of entity metadata, just a simple property.
     #[Vich\UploadableField(mapping: 'userImages', fileNameProperty: 'name', size: 'size')]
+    #[Assert\NotNull(groups: ['user_image_post'])]
     private ?File $file = null;
 
     /**
@@ -114,15 +160,15 @@ class UserImage
         return $this;
     }
 
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
+    // public function getUser(): ?User
+    // {
+    //     return $this->user;
+    // }
 
-    public function setUser(User $user): static
-    {
-        $this->user = $user;
+    // public function setUser(User $user): static
+    // {
+    //     $this->user = $user;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 }

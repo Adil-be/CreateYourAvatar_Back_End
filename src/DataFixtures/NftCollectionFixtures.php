@@ -35,14 +35,18 @@ class NftCollectionFixtures extends Fixture
         foreach ($collections as $collectionName) {
             $nftCollection = new NftCollection();
             $nftCollection->setName($collectionName)
-                ->setDescription($this->faker->text())
-                ->setPath($folder . $nftCollection->getName());
+                ->setDescription($this->faker->text(500));
+            
 
             $imageFile = $this->createImage($nftCollection->getName());
             $fileSystem->copy(
                 $imageFile->getRealPath(),
                 $destination . $imageFile->getFilename()
             );
+
+            $nftCollection->setImageName($imageFile->getFilename());
+            $nftCollection->setImageSize($imageFile->getSize());
+            // $nftCollection->setPath($folder . $imageFile->getFilename());
             $manager->persist($nftCollection);
         }
 
