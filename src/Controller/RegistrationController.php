@@ -18,14 +18,13 @@ class RegistrationController extends AbstractController
     public function register(
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
-        UserRepository $userRepository,
+       UserRepository $userRepository,
         EntityManagerInterface $manager
     ): Response {
 
         $jsonData = $request->getContent();
 
         $userData = json_decode($jsonData);
-
 
         $email = $userData->email;
         $password = $userData->password;
@@ -39,7 +38,7 @@ class RegistrationController extends AbstractController
                 $password
             );
             $user->setEmail($email)
-                ->setPassword($hashedPassword);
+                ->setPassword($hashedPassword); 
 
             if (isset($userData->username) && !empty($userData->username)) {
                 $user->setUsername($userData->username);
@@ -65,27 +64,17 @@ class RegistrationController extends AbstractController
                 $manager->persist($user);
                 $manager->flush();
 
-                $data = [
-                    'message' => "l'utilisateur a bien été enregistré !",
-                    "success" => true,
-                ];
-                $response = new JsonResponse($data);
+                $data = ['message' => "l'utilisateur a bien été enregistré !", "success" => true,];
+
             } else {
-                $data =
-                    [
-                        'message' => 'Email already exist',
-                        "success" => false
-                    ]
-                ;
-                $response = new JsonResponse($data);
+                $data = ['message' => 'Email already exist', "success" => false];
             }
         } else {
             $data = ['message' => 'Some field are invalid or missing', "success" => false];
-            $response = new JsonResponse(
-                $data
-            );
         }
 
-        return $response;
+        return new JsonResponse(
+            $data
+        );
     }
 }

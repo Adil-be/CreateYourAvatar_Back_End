@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
+use App\Controller\NftController;
 
 
 #[ORM\Entity(repositoryClass: NftRepository::class)]
@@ -31,6 +32,8 @@ use ApiPlatform\Metadata\Patch;
         ),
         new Patch(
             security: "is_granted('ROLE_ADMIN') or object.user == user"
+        ),
+        new Post(    
         ),
         // new Put(security: "is_granted('ROLE_ADMIN') or object.user == user"),
         new Delete(
@@ -45,7 +48,6 @@ use ApiPlatform\Metadata\Patch;
             controller: PlaceholderAction::class,
             normalizationContext: ['groups' => ['nft:read:full']],
         ),
-        new Post(security: "is_granted('ROLE_ADMIN')"),
     ],
     paginationItemsPerPage: 20,
     paginationClientItemsPerPage: true
@@ -108,7 +110,7 @@ class Nft
 
     public function __construct()
     {
-        
+
     }
 
 

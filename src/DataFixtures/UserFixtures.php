@@ -20,18 +20,6 @@ class UserFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-
-        $admin = new User();
-        $admin->setEmail("adel-b@gmail.com");
-        $admin->setRoles(['ROLE_ADMIN']);
-        $admin->setUsername('adel');
-        $admin->setPassword(
-            $this->passwordHasher->hashPassword(
-                $admin,
-                '666'
-            )
-        );
-
         $TatyJosy = new User();
         $TatyJosy->setRoles(['ROLE_ADMIN']);
         $TatyJosy->setEmail("TatyJosy@gmail.com");
@@ -40,6 +28,17 @@ class UserFixtures extends Fixture
             $this->passwordHasher->hashPassword(
                 $TatyJosy,
                 '1234'
+            )
+        );
+
+        $admin = new User();
+        $admin->setEmail("adel-b@gmail.com");
+        $admin->setRoles(['ROLE_ADMIN']);
+        $admin->setUsername('adel');
+        $admin->setPassword(
+            $this->passwordHasher->hashPassword(
+                $admin,
+                '007'
             )
         );
 
@@ -53,9 +52,7 @@ class UserFixtures extends Fixture
             )
         );
 
-
         // images Users
-
         $users = [$toto, $TatyJosy, $admin];
         $fileSystem = new Filesystem();
         $folder = 'images/userImages/';

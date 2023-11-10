@@ -124,7 +124,7 @@ class NftModelFixtures extends Fixture implements DependentFixtureInterface
                 ->setFeatured($this->faker->boolean(20))
                 ->setQuantity(7 + $this->faker->randomNumber(0))
                 ->setDescription($this->faker->text())
-                ->setInitialPrice($this->faker->randomFloat(2, 0, 2))
+                ->setInitialPrice($this->faker->randomFloat(2, 0, 10))
                 ->setCreatedAt(\DateTimeImmutable::createFromMutable($this->faker->dateTime()));
             foreach ($data['categories'] as $categoryName) {
                 $category = $this->categoryRepository->findOneBy(['name' => $categoryName]);

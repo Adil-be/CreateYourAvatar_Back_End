@@ -38,7 +38,6 @@ class CustomImageNormalizer implements ContextAwareNormalizerInterface, Normaliz
 
         $baseUrl = $this->urlGenerator->generate('root', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $url = $this->storage->resolveUri($object, 'file');
-        // $url= "test";
         $object->setPath($baseUrl . $url);
 
         $context[self::ALREADY_CALLED] = true;
