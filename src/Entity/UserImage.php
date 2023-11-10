@@ -56,11 +56,11 @@ class UserImage
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['user:read', 'nft:read:full', 'user:collection:get'])]
+    #[Groups(['user:read', 'nft:read:full'])]
     private ?int $id = null;
 
 
-    #[Groups(['user:read', 'nft:read:full', 'user:collection:get', 'user_auth:read'])]
+    #[Groups(['user:read', 'nft:read:full', 'user_auth:read'])]
     private ?string $path = null;
 
     #[ORM\Column(nullable: true)]

@@ -20,7 +20,8 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Put;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: NftModelRepository::class)]
 #[ApiResource(
@@ -29,7 +30,6 @@ use ApiPlatform\Metadata\Put;
     operations: [
         new Get(),
         new Patch(security: "is_granted('ROLE_ADMIN')"),
-        // new Put(security: "is_granted('ROLE_ADMIN')"),
         new Delete(security: "is_granted('ROLE_ADMIN')"),
         new GetCollection(),
         new Post(security: "is_granted('ROLE_ADMIN')"),
@@ -40,21 +40,11 @@ use ApiPlatform\Metadata\Put;
 
 #[ApiFilter(BooleanFilter::class, properties: ['featured'])]
 #[ApiFilter(OrderFilter::class, properties: ['initialPrice', 'createdAt'])]
-#[ApiFilter(NumericFilter::class, properties: ['user.id'])]
-#[ApiFilter(RangeFilter::class, properties: ['sellingPrice'])]
-#[ApiFilter(SearchFilter::class, properties: ['nftModel.name' => 'partial', 'nftModel.description' => 'partial'])]
+#[ApiFilter(NumericFilter::class, properties: ['nft.user.id', 'nftCollection.id'])]
+#[ApiFilter(RangeFilter::class, properties: ['initialPrice'])]
+#[ApiFilter(SearchFilter::class, properties: ['name' => 'partial', 'description' => 'partial'])]
 class NftModel
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    #[Groups(['NftModel:read', 'nft:read:full'])]
-    private ?int $id = null;
-
-    #[ORM\Column(length: 255)]
-    #[Groups(['NftModel:write', 'NftModel:read', 'nft:read:full'])]
-    private ?string $name = null;
-
     public function __construct()
     {
         $this->nft = new ArrayCollection();
@@ -64,7 +54,21 @@ class NftModel
         $this->createdAt = new \DateTimeImmutable;
     }
 
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    #[Groups(['NftModel:read', 'nft:read:full'])]
+    private ?int $id = null;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['NftModel:write', 'NftModel:read', 'nft:read:full'])]
+    #[Assert\NotBlank]
+    private ?string $name = null;
+
+
     #[ORM\Column(nullable: true)]
+    #[Assert\NotBlank]
+    #[Assert\Positive]
     #[Groups(['NftModel:read', 'nft:read:full'])]
     private ?float $initialPrice = null;
 
@@ -73,10 +77,17 @@ class NftModel
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['NftModel:read', 'nft:read:full'])]
     private ?int $quantity = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['NftModel:write', 'NftModel:read', 'nft:read:full'])]
+    #[Assert\Length(
+        min: 2,
+        max: 500,
+        minMessage: 'Your description must be at least {{ limit }} characters long',
+        maxMessage: 'Your description cannot be longer than {{ limit }} characters',
+    )]
     private ?string $description = null;
 
     #[ORM\OneToMany(mappedBy: 'nftModel', targetEntity: Nft::class)]
@@ -119,7 +130,7 @@ class NftModel
 
         return $this;
     }
-
+// ....
     public function getInitialPrice(): ?float
     {
         return $this->initialPrice;
@@ -277,7 +288,7 @@ class NftModel
         return $this;
     }
 
-        /**
+    /**
      * @return Collection<int, NftValue>
      */
     public function getNftValues(): Collection

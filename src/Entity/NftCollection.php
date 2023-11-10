@@ -44,7 +44,9 @@ use App\Controller\PostImageCollectionController;
             controller: PostImageCollectionController::class,
             deserialize: false
         ),
-    ], )]
+    ],
+    paginationItemsPerPage: 10,
+    paginationClientItemsPerPage: true) ]
 #[Vich\Uploadable]
 class NftCollection
 {

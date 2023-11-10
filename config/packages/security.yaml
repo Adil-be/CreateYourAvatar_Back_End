@@ -25,17 +25,22 @@ security:
       pattern: ^/api/login
       stateless: true
       provider: app_user_provider
-      # anonymous: true
       json_login:
         check_path: /api/login
         success_handler: lexik_jwt_authentication.handler.authentication_success
         failure_handler: lexik_jwt_authentication.handler.authentication_failure
-      jwt: ~
     api:
       pattern: ^/api
       stateless: true
       provider: jwt
       jwt: ~
+
+    main:
+      pattern: ^/
+      stateless: true
+      provider: jwt
+      jwt: ~
+
 
     # main:
     #   lazy: true

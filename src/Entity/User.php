@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Action\PlaceholderAction;
 use ApiPlatform\Metadata\ApiResource;
-use App\Controller\PostImageUserController;
+
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -33,7 +33,7 @@ use ApiPlatform\Metadata\Patch;
             denormalizationContext: ['groups' => ['user:write']]
         ),
         new GetCollection(
-            normalizationContext: ['groups' => ['user:collection:get']]
+            normalizationContext: ['groups' => ['user:read']]
         ),
         new Get(
             normalizationContext: ['groups' => ['user:read']]
@@ -45,7 +45,6 @@ use ApiPlatform\Metadata\Patch;
             security: "is_granted('ROLE_ADMIN') or object == user",
             normalizationContext: ['groups' => ['user_auth:read']]
         ),
-        // new Post(name: 'imageUser', uriTemplate: '/users/{id}/image', controller: PostImageUserController::class),
     ], )]
 
 class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUserInterface
@@ -58,7 +57,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['read', 'user:read', 'user:collection:get', 'user_auth:read', 'nft:read:full'])]
+    #[Groups([ 'user:read', 'user_auth:read', 'nft:read:full'])]
     private ?int $id = null;
 
     public function getId(): ?int
@@ -67,7 +66,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
     }
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['user:write', 'read', 'user:read', 'user:collection:get', 'user_auth:read', 'nft:read:full'])]
+    #[Groups(['user:write', 'user:read', 'user_auth:read', 'nft:read:full'])]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -81,15 +80,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
     private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['user_auth:write', 'user:read', 'user:collection:get', 'user_auth:read', 'nft:read:full'])]
-    private ?string $username = 'anonymous';
+    #[Groups(['user_auth:write', 'user:read',  'user_auth:read', 'nft:read:full'])]
+    private ?string $username = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['user:write', 'user:read', 'user_auth:read'])]
+    #[Groups(['user:write', 'user_auth:read'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['user:write', 'user:read', 'user_auth:read'])]
+    #[Groups(['user:write', 'user_auth:read'])]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -105,12 +104,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
     private ?string $address = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Nft::class)]
-    #[Groups(['user_auth:read', 'user:collection:get', 'user:read'])]
+    #[Groups(['user_auth:read', 'user:read'])]
     private Collection $nfts;
 
     #[ORM\OneToOne(targetEntity: UserImage::class)]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['user:write', 'user:read', 'user_auth:read', 'user:collection:get', 'nft:read:full'])]
+    #[Groups(['user:write', 'user:read', 'user_auth:read', 'nft:read:full'])]
     private ?UserImage $userImage = null;
 
 
