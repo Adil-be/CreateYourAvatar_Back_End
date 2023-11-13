@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}List Users
+{% endblock %}
+
+{% block body %}
+    <section class=''>
+        <h1>
+            Collection Nft CRUD</h1>
+
+        <a class='btn btn-primary' href="{{path('app_admin_nftCollection_new')}}">Create a NFT collection
+        </a>
+
+
+        <div class='row'>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">name</th>
+                        <th scope="col">NftModel</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for nftCollection in nftCollections %}
+                        <tr>
+                            {% set routes = {'modify':'app_admin_nftCollection_modify','delete':'app_admin_nftCollection_delete'} %}
+                            <th scope="row">{{nftCollection.id}}</th>
+                            <td>{{nftCollection.name}}</td>
+                            <td>
+                                {% for model in nftCollection.NftModels %}
+                                    <a href="{{path( 'app_admin_nftModel_modify' ,{'id': model.id})}}">{{model.name}}</a><br>
+                                {% endfor %}
+                            </td>
+
+
+                            <td>
+                                {% include "includes/_dropdown.html.twig" with {'routes': routes, 'id':nftCollection.id} only %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </tbody>
+            </tr>
+        {% endfor %}
+    </tbody>
+</div></section>{% endblock %}

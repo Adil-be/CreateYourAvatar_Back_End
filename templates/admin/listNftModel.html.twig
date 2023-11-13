@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}List Users
+{% endblock %}
+
+{% block body %}
+    <section class=''>
+        <h1>Crud NftModel</h1>
+
+        <a class='btn btn-primary' href="{{path('app_admin_nftModel_new')}}">Create a NFT Model</a>
+
+
+        <div class='row'>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">name</th>
+                        <th scope="col">Date Creation</th>
+                        <th scope="col">Prix initiale</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for nftModel in nftModels %}
+                        <tr>
+                            {% set routes = {'modify':'app_admin_nftModel_modify','delete':'app_admin_nftModel_delete'} %}
+                            <th scope="row">{{nftModel.id}}</th>
+                            <td>{{nftModel.name }}</td>
+                            <td>{{nftModel.createdAt | format_date}}</td>
+                            <td>{{nftModel.initialPrice}}</td>
+                            <td>{{nftModel.quantity}}</td>
+                            <td>
+                                {% include "includes/_dropdown.html.twig" with {'routes': routes, 'id':nftModel.id} only %}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </div>
+        </section>
+    {% endblock %}

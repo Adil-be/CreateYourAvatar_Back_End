@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}List Users
+{% endblock %}
+
+{% block body %}
+    <section class=''>
+        <h1>Dashboard</h1>
+        <p>Welcome to your back office
+            {{app.user.email}}
+        </p>
+        <a class='btn btn-primary' href="{{path('app_admin_nft_new')}}">Create NFT</a>
+
+
+        <div class='row'>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Token</th>
+                        <th scope="col">Owner</th>
+                        <th scope="col">Date purchase</th>
+                        <th scope="col">Purchase Price</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for nft in nfts %}
+                        <tr>
+                            {% set routes = {'modify':'app_admin_nft_modify','delete':'app_admin_nft_delete'} %}
+                            <th scope="row">{{nft.id}}</th>
+                            <td>{{nft.token }}</td>
+                            <td>{{nft.user.email}}</td>
+                            <td>{{nft.purchaseDate | format_date}}</td>
+                            <td>{{nft.buyingPrice}}</td>
+                            <td>
+                                {% include "includes/_dropdown.html.twig" with {'routes': routes, 'id':nft.id} only %}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </div>
+        </section>
+    {% endblock %}

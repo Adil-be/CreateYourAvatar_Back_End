@@ -57,6 +57,7 @@ class NftModelFixtures extends Fixture implements DependentFixtureInterface
         $SteamPunk = 'SteamPunk';
         $HeroicFantasy = 'HeroicFantasy';
         $CyberTech = 'CyberTech';
+        $Samourai= 'Samourai';
 
         //$collections = ['SteamPunk', 'HeroicFantasy', 'CyberTech']; 
 
@@ -73,6 +74,10 @@ class NftModelFixtures extends Fixture implements DependentFixtureInterface
                 'categories' => [$arm, $bracer],
                 'collection' => $SteamPunk,
             ],
+            'Gauntlet of the Samourai' => [
+                'categories' => [$arm, $bracer],
+                'collection' => $Samourai,
+            ],
             'Jacket of the Phoenix' => [
                 'categories' => [$chest, $jacket],
                 'collection' => $CyberTech,
@@ -84,6 +89,10 @@ class NftModelFixtures extends Fixture implements DependentFixtureInterface
             'Chestplate of strength' => [
                 'categories' => [$chest, $chestplate],
                 'collection' => $SteamPunk,
+            ],
+            'Chestplate of the Dragon' => [
+                'categories' => [$chest, $chestplate],
+                'collection' => $Samourai,
             ],
             'Helm of Swiftness' => [
                 'categories' => [$head, $helmet],
@@ -100,6 +109,10 @@ class NftModelFixtures extends Fixture implements DependentFixtureInterface
             'Helm of the knignt' => [
                 'categories' => [$head, $helmet],
                 'collection' => $HeroicFantasy,
+            ],
+            'Helmet of the Ronin' => [
+                'categories' => [$head, $helmet],
+                'collection' => $Samourai,
             ],
             'Helm of ether' => [
                 'categories' => [$head, $helmet],

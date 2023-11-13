@@ -19,7 +19,7 @@ use ApiPlatform\OpenApi\Model;
 #[ApiResource(operations: [
     new Get(normalizationContext: ['groups' => ['image:read']]),
     new Post(
-        name: 'imageUser',
+        name: 'postImageUser',
         uriTemplate: '/image/user/{id}',
         controller: PostImageUserController::class,
         deserialize: false,

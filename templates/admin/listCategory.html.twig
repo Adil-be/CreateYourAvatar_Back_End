@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}List Users
+{% endblock %}
+
+{% block body %}
+    <section class=''>
+        <h1>
+            Category CRUD</h1>
+
+        <a class='btn btn-primary' href="{{path('app_admin_category_new')}}">Create a Category
+        </a>
+
+
+        <div class='row'>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">name</th>
+                        <th scope="col">Parent</th>
+                        <th scope="col">Nft model associé</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for category in categories %}
+                        <tr>
+                            {% set routes = {'modify':'app_admin_category_modify','delete':'app_admin_category_delete'} %}
+                            <th scope="row">{{category.id}}</th>
+                            <td>{{category.name}}</td>
+                            <td>{{category.parent ? category.parent.name : '' }}</td>
+                            <td>
+                                {% for model in category.nftModels %}
+                                    <a href="{{path( 'app_admin_nftModel_modify' ,{'id': model.id})}}">{{model.name}}</a><br>
+                                {% endfor %}
+                            </td>
+
+
+                            <td>
+                                {% include "includes/_dropdown.html.twig" with {'routes': routes, 'id':category.id} only %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </tbody>
+            </tr>
+        {% endfor %}
+    </tbody>
+</div></section>{% endblock %}

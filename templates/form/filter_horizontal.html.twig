@@ -1,0 +1,12 @@
+{% block form %}
+    {{ form_start(form) }}
+    <div class="d-flex flex-row gap-3">
+        {{ form_widget(form) }}
+    </div>
+    {{ form_end(form) }}
+
+{% endblock %}
+
+{# remove class bootsrap col-sm-2, ajout class perso #}
+{% block form_label_class %}filter
+{% endblock form_label_class %}

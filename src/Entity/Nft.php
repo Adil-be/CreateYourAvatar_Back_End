@@ -21,7 +21,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
-use App\Controller\NftController;
+
 
 
 #[ORM\Entity(repositoryClass: NftRepository::class)]
@@ -31,7 +31,7 @@ use App\Controller\NftController;
             normalizationContext: ['groups' => ['nft:read']]
         ),
         new Patch(
-            security: "is_granted('ROLE_ADMIN') or object.user == user"
+            security: "object.getUser().getId() == user.getId()"
         ),
         new Post(    
         ),
@@ -94,7 +94,7 @@ class Nft
 
 
 
-    #[ORM\ManyToOne(inversedBy: 'nft')]
+    #[ORM\ManyToOne(inversedBy: 'nfts')]
     #[Groups(['nft:read', 'nft:read:full'])]
     private ?NftModel $nftModel = null;
 
