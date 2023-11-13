@@ -27,7 +27,7 @@ class NftCollectionFixtures extends Fixture
         $fileSystem = new Filesystem();
         $destination = __DIR__ . '/../../public/images/collectionImages/';
         $folder = 'images/collectionImages/';
-        $collections = ['SteamPunk', 'HeroicFantasy', 'CyberTech'];
+        $collections = ['SteamPunk', 'HeroicFantasy', 'CyberTech','Samourai'];
 
         $init = $this->deleteDir($destination);
 

@@ -45,6 +45,7 @@ class PostImageUserController extends AbstractController
 
             $user->setUserImage($userImage);
             $entityManager->persist($user);
+            $entityManager->flush();
 
             return $userImage;
         } else {

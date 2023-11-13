@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}List Users
+{% endblock %}
+
+{% block body %}
+    <section class=''>
+        <h1>Dashboard</h1>
+        <p>Welcome to your back office
+            {{app.user.email}}
+        </p>
+        <a class='btn btn-primary' href="{{path('app_admin_user_new')}}">Create User</a>
+
+
+        <div class='row'>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Username</th>
+                        <th scope="col">Firstname</th>
+                        <th scope="col">Lastname</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for user in users %}
+                        <tr>
+                            {% set routes = {'modify':'app_admin_user_modify','delete':'app_admin_user_delete'} %}
+                            <th scope="row">{{user.id}}</th>
+                            <td>{{user.email}}</td>
+                            <td>{{user.username}}</td>
+                            <td>{{user.firstname}}</td>
+                            <td>{{user.lastname}}</td>
+                            <td>
+                                {% include "includes/_dropdown.html.twig" with {'routes': routes, 'id':user.id} only %}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </div>
+        </section>
+    {% endblock %}

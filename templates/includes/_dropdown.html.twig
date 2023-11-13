@@ -1,0 +1,13 @@
+<div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Action
+    </button>
+    <ul class="dropdown-menu dropdown-menu-dark">
+        <li>
+            <a class="dropdown-item " href="{{path( routes.modify ,{'id': id})}}">Modify</a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="{{path( routes.delete ,{'id': id})}}">Delete</a>
+        </li>
+    </ul>
+</div>

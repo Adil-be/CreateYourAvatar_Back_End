@@ -25,7 +25,7 @@ use ApiPlatform\Metadata\Patch;
 #[ApiResource(
     operations: [
         new Patch(
-            security: "is_granted('ROLE_ADMIN') or object == user",
+            security: "is_granted('ROLE_ADMIN') or object.getId() == user.getId()",
             securityMessage: 'Sorry, but you are not the user.',
             denormalizationContext: ['groups' => ['user:write']]
         ),
@@ -42,7 +42,8 @@ use ApiPlatform\Metadata\Patch;
             name: 'AuthenticatedUser',
             uriTemplate: '/user_auth/{id}',
             controller: PlaceholderAction::class,
-            security: "is_granted('ROLE_ADMIN') or object == user",
+            security: "is_granted('ROLE_ADMIN') or object.getId() == user.getId()",
+            securityMessage: 'Sorry, but you are not the user.',
             normalizationContext: ['groups' => ['user_auth:read']]
         ),
     ], )]
@@ -93,7 +94,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['user:write', 'user_auth:read'])]
-    private ?string $gender = 'male';
+    private ?string $gender = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['user:write', 'user_auth:read'])]
@@ -103,11 +104,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
     #[Groups(['user:write', 'user_auth:read'])]
     private ?string $address = null;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Nft::class)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Nft::class,cascade: ['remove'])]
     #[Groups(['user_auth:read', 'user:read'])]
     private Collection $nfts;
 
-    #[ORM\OneToOne(targetEntity: UserImage::class)]
+    #[ORM\OneToOne(targetEntity: UserImage::class,cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: true)]
     #[Groups(['user:write', 'user:read', 'user_auth:read', 'nft:read:full'])]
     private ?UserImage $userImage = null;
@@ -306,10 +307,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JWTUser
         return $this;
     }
 
-    public static function createFromPayload($username, array $payload): self
+    public static function createFromPayload($id, array $payload): self
     {
         return (new self())
-            ->setId($username)
+            ->setId($id)
             ->setRoles($payload['roles'])
             ->setEmail($payload['email'])
         ;

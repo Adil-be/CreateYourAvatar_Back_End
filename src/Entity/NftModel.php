@@ -92,7 +92,7 @@ class NftModel
 
     #[ORM\OneToMany(mappedBy: 'nftModel', targetEntity: Nft::class)]
     #[Groups(['NftModel:read'])]
-    private Collection $nft;
+    private Collection $nfts;
 
     #[ORM\ManyToOne(inversedBy: 'NftModels')]
     #[Groups(['NftModel:read', 'nft:read:full'])]
@@ -102,17 +102,26 @@ class NftModel
     #[Groups(['NftModel:read', 'nft:read:full'])]
     private Collection $categories;
 
-    #[ORM\OneToMany(mappedBy: 'nftModel', targetEntity: NftImage::class)]
-    #[Groups(['NftModel:read', 'nft:read:full'])]
-    private Collection $nftImages;
+    // #[ORM\OneToMany(mappedBy: 'nftModel', targetEntity: NftImage::class)]
+    // #[Groups(['NftModel:read', 'nft:read:full'])]
+    // private Collection $nftImages;
 
-    #[ORM\OneToMany(mappedBy: 'nftModel', targetEntity: NftValue::class)]
+    #[ORM\OneToMany(mappedBy: 'nftModel', targetEntity: NftValue::class, cascade: ['persist', 'remove'])]
     #[Groups(['NftModel:read'])]
     private Collection $nftValues;
 
     #[ORM\Column]
     #[Groups(['NftModel:read'])]
     private ?bool $featured = null;
+
+    #[ORM\OneToOne(targetEntity: NftImage::class, cascade: ['persist', 'remove'])]
+    #[Groups(['NftModel:read', 'nft:read:full'])]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?NftImage $nftImage = null;
+
+    // #[ORM\OneToOne(targetEntity: NftImage::class, mappedBy: 'nftModel', cascade: ['persist', 'remove'])]
+    // #[Groups(['NftModel:read', 'nft:read:full'])]
+    // private ?NftImage $nftImage = null;
 
     public function getId(): ?int
     {
@@ -130,7 +139,7 @@ class NftModel
 
         return $this;
     }
-// ....
+    // ....
     public function getInitialPrice(): ?float
     {
         return $this->initialPrice;
@@ -180,15 +189,15 @@ class NftModel
     /**
      * @return Collection<int, Nft>
      */
-    public function getNft(): Collection
+    public function getNfts(): Collection
     {
-        return $this->nft;
+        return $this->nfts;
     }
 
     public function addNft(Nft $nft): static
     {
-        if (!$this->nft->contains($nft)) {
-            $this->nft->add($nft);
+        if (!$this->nfts->contains($nft)) {
+            $this->nfts->add($nft);
             $nft->setNftModel($this);
         }
 
@@ -197,7 +206,7 @@ class NftModel
 
     public function removeNft(Nft $nft): static
     {
-        if ($this->nft->removeElement($nft)) {
+        if ($this->nfts->removeElement($nft)) {
             // set the owning side to null (unless already changed)
             if ($nft->getNftModel() === $this) {
                 $nft->setNftModel(null);
@@ -246,35 +255,7 @@ class NftModel
         return $this;
     }
 
-    /**
-     * @return Collection<int, NftImage>
-     */
-    public function getNftImages(): Collection
-    {
-        return $this->nftImages;
-    }
 
-    public function addNftImage(NftImage $nftImage): static
-    {
-        if (!$this->nftImages->contains($nftImage)) {
-            $this->nftImages->add($nftImage);
-            $nftImage->setNftModel($this);
-        }
-
-        return $this;
-    }
-
-    public function removeNftImage(NftImage $nftImage): static
-    {
-        if ($this->nftImages->removeElement($nftImage)) {
-            // set the owning side to null (unless already changed)
-            if ($nftImage->getNftModel() === $this) {
-                $nftImage->setNftModel(null);
-            }
-        }
-
-        return $this;
-    }
 
     public function isFeatured(): ?bool
     {
@@ -314,6 +295,30 @@ class NftModel
                 $nftValue->setNftModel(null);
             }
         }
+
+        return $this;
+    }
+
+    // public function getNftImage(): ?NftImage
+    // {
+    //     return $this->nftImage;
+    // }
+
+    // public function setNftImage(?NftImage $nftImage): static
+    // {
+    //     $this->nftImage = $nftImage;
+
+    //     return $this;
+    // }
+
+    public function getNftImage(): ?NftImage
+    {
+        return $this->nftImage;
+    }
+
+    public function setNftImage(NftImage $nftImage): static
+    {
+        $this->nftImage = $nftImage;
 
         return $this;
     }

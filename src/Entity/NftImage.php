@@ -34,6 +34,10 @@ use Symfony\Component\HttpFoundation\File\File;
 #[Vich\Uploadable]
 class NftImage
 {
+    public function __construct()
+    {
+        $this->updatedAt = new \DateTimeImmutable();
+    }
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -41,31 +45,15 @@ class NftImage
     #[Groups(['NftImage:read'])]
     private ?int $id = null;
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    #[ORM\Column(length: 255)]
-    #[Groups(['NftImage:write', 'NftImage:read'])]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $name = null;
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
 
-    public function setName(string $name): static
-    {
-        $this->name = $name;
-
-        return $this;
-    }
 
     // NOTE: This is not a mapped field of entity metadata, just a simple property.
     #[Vich\UploadableField(mapping: 'nftImages', fileNameProperty: 'name', size: 'size')]
     private ?File $file = null;
 
-    #[Groups(['NftImage:read', 'NftModel:read','nft:read:full'])]
+    #[Groups(['NftImage:read', 'NftModel:read', 'nft:read:full'])]
     private ?string $path = null;
 
     #[ORM\Column(nullable: true)]
@@ -77,14 +65,31 @@ class NftImage
     #[Groups(['NftImage:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\ManyToOne(inversedBy: 'nftImages')]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['NftImage:read'])]
-    private ?NftModel $nftModel = null;
+    // #[ORM\OneToOne(targetEntity: NftModel::class, inversedBy: 'nftImage')]
+    // #[Groups(['NftImage:read'])]
+    // private ?NftModel $nftModel = null;
+
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
 
     public function getPath(): ?string
     {
-        return  $this->path;
+        return $this->path;
     }
 
     public function setPath(string $path): static
@@ -147,15 +152,21 @@ class NftImage
         return $this->file;
     }
 
-    public function getNftModel(): ?NftModel
-    {
-        return $this->nftModel;
-    }
 
-    public function setNftModel(?NftModel $nftModel): static
-    {
-        $this->nftModel = $nftModel;
+    // public function getNftModel(): ?NftModel
+    // {
+    //     return $this->nftModel;
+    // }
 
-        return $this;
-    }
+    // public function setNftModel(NftModel $nftModel): static
+    // {
+    //     // set the owning side of the relation if necessary
+    //     if ($nftModel->getNftImage() !== $this) {
+    //         $nftModel->setNftImage($this);
+    //     }
+
+    //     $this->nftModel = $nftModel;
+
+    //     return $this;
+    // }
 }

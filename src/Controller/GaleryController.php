@@ -25,7 +25,7 @@ class GaleryController extends AbstractController
     }
 
     #[IsGranted("ROLE_USER")]
-    #[Route('/galery', name: 'app_galery')]
+    #[Route('/api/galery', name: 'app_galery')]
     public function index(): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
@@ -51,7 +51,7 @@ class GaleryController extends AbstractController
         foreach ($nfts as $nft) {
 
             $model = $nft->getNftModel();
-            $nftImages = $model->getNftImages()->toArray();
+            $nftImage = $model->getNftImage();
             $values = $model->getNftValues();
 
             $lastValue = count($values) - 1;
@@ -59,7 +59,7 @@ class GaleryController extends AbstractController
             $object = [
                 'nft' => $nft,
                 'nftModel' => $model,
-                'nftImages' => $nftImages,
+                'nftImage' => $nftImage,
                 'current' => $values[$lastValue],
                 'previous' => $values[$lastValue - 1],
             ];
