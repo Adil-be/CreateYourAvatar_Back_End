@@ -2,14 +2,15 @@
 
 ## Préambule
 
-Josianne, aussi appelée Tatty Josy dans le domaine, est une femme que l’on retrouve dans des thématiques
-souvent… inattendues !
+Projet réaliser pour la soutenance de ma formation Developpeur Web et web mobile.
 
-Forte de son expérience dans le domaine du digital, la Josy, et sa soixantaine passée, souhaite se lancer avant tout le monde dans le Web 3.0, c’est-à-dire celui de la blockchain !
+Il s'agit de la partie Back End de mon site CreateYourAvatar.fr réalisé sous Symfony 6 avec Api Platform.
 
-Malheureusement, avec déjà de nombreux projets en cours, elle souhaite déléguer ce nouveau projet et donner
-sa chance à un junior sur le marché afin de lui apporter de l’expérience et, pourquoi pas, un tremplin dans sa
-carrière.
+La partie Front end se trouve sur le repo github : [CreateYourAvatar_Front_End](https://github.com/Adil-be/CreateYourAvatar_Front_End)
+
+## Déployement 
+
+Le projet est déployé a l'adresse : [CreateYourAvatar.fr](CreateYourAvatar.fr)
 
 ## Architecture du projet
 
